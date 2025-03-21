@@ -1,3 +1,23 @@
+/* 微交互动画 */
+.hover-scale {
+  transition: transform 0.2s ease;
+}
+
+.hover-scale:hover {
+  transform: scale(1.02);
+}
+
+/* 暗黑模式优化 */
+.dark-theme .wy-nav-side {
+  background: rgba(32, 32, 32, 0.95);
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .card {
+    backdrop-filter: blur(5px);
+  }
+}
 /*
  * Wrap inline code samples otherwise they shoot of the side and
  * can't be read at all.
