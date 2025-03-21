@@ -12,98 +12,137 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
     
     <style>
+        /* 新增科技感动态标题 */
         :root {
-            --primary-gradient: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+            --neon-blue: #00f2fe;
+            --deep-space: #0a1929;
             --glass-bg: rgba(255, 255, 255, 0.1);
-            --blur-intensity: blur(10px);
         }
 
-        .dark-theme {
-            --background: #0a1929;
-            --text: #e0f2fe;
-            --glass-bg: rgba(18, 18, 18, 0.8);
-        }
-
-        /* 科技感动态标题 */
         .sci-fi-header {
             background: linear-gradient(45deg, 
-                #00f2fe 25%, 
+                var(--neon-blue) 25%, 
                 #4facfe 50%, 
-                #00f2fe 75%);
+                var(--neon-blue) 75%);
             background-size: 400% 400%;
             animation: gradientFlow 8s ease infinite;
             -webkit-background-clip: text;
             color: transparent;
-            border-bottom: 2px solid #4facfe;
+            padding: 1.2rem 0;
+            border-bottom: 2px solid var(--neon-blue);
         }
 
         /* 知识树3D节点 */
         .knowledge-node {
-            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             transform-style: preserve-3d;
+            cursor: pointer;
+            perspective: 1000px;
         }
 
         .knowledge-node.flipped {
             transform: rotateY(180deg);
         }
 
-        /* 暗黑模式修复 */
-        body.dark-theme {
-            background: var(--background);
-            color: var(--text);
+        /* 修复暗黑模式 */
+        .dark-theme {
+            background: var(--deep-space);
+            color: #e0f2fe;
+        }
+
+        .dark-theme .wy-nav-side {
+            background: rgba(18, 18, 18, 0.95);
+        }
+
+        @keyframes gradientFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
     </style>
 </head>
 
 <body class="wy-body-for-nav">
-    <!-- 暗黑模式切换 -->
-    <button id="theme-toggle">
-        <svg width="24" height="24"><path d="M12 18a6 6 0 1 1 0-12 6 6 0 0 1 0 12zM11 1h2v3h-2zM11 20h2v3h-2zM3.5 4.9l1.4 1.4L4.9 7.8 3.5 6.3 2.1 4.9zm14.2 14.2 1.4 1.4-1.4 1.4-1.4-1.4zm-15.1.1h3v2h-3zm17-15.1v3h2v-3z"/></svg>
+    <!-- 暗黑模式切换按钮 -->
+    <button id="theme-toggle" class="glass-button">
+        <svg width="24" height="24">
+            <path d="M12 18a6 6 0 1 1 0-12 6 6 0 0 1 0 12zM11 1h2v3h-2zM11 20h2v3h-2zM3.5 4.9l1.4 1.4L4.9 7.8 3.5 6.3 2.1 4.9zm14.2 14.2 1.4 1.4-1.4 1.4-1.4-1.4zm-15.1.1h3v2h-3zm17-15.1v3h2v-3z"/>
+        </svg>
     </button>
 
-    <!-- 主内容区 -->
-    <section class="wy-nav-content-wrap">
-        <div class="wy-nav-content">
-            <h1 class="sci-fi-header">欢迎来到零一知识库</h1>
-            
-            <!-- 学习资源板块 -->
-            <div class="card static-card">
-                <h2>学习资源</h2>
-                <ul>
-                    <li><a href="计算机科学/">计算机科学知识树</a></li>
-                    <li><a href="工程技术/">工程实践指南</a></li>
-                </ul>
-            </div>
+    <div class="wy-grid-for-nav">
+        <!-- 导航栏保留原有结构 -->
+        <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+            <!-- 原有导航内容保持不变 -->
+        </nav>
 
-            <!-- 知识树状图 -->
-            <div id="knowledge-tree">
-                <div class="node-root">零一知识库
-                    <div class="node-branch">自然科学
-                        <div class="knowledge-node">力学</div>
-                        <div class="knowledge-node">电磁学</div>
+        <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+            <div class="wy-nav-content">
+                <div class="rst-content">
+                    <!-- 更新标题 -->
+                    <h1 class="sci-fi-header">欢迎来到零一知识库</h1>
+
+                    <!-- 学习资源板块 -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card hover-card">
+                                <div class="card-body">
+                                    <h2>学习资源</h2>
+                                    <ul class="neon-list">
+                                        <li><a href="计算机科学/">计算机科学知识树</a></li>
+                                        <li><a href="工程技术/">工程实践指南</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="node-branch">工程技术
-                        <div class="knowledge-node">机械设计</div>
-                        <div class="knowledge-node">电子工程</div>
+
+                    <!-- 新增知识树结构 -->
+                    <div class="knowledge-tree">
+                        <div class="node" data-target="计算机科学/">
+                            <div class="node-front">计算机科学</div>
+                            <div class="node-back">进入领域 →</div>
+                        </div>
+                        <div class="node" data-target="工程技术/">
+                            <div class="node-front">工程技术</div>
+                            <div class="node-back">进入领域 →</div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
+    </div>
 
     <script>
-        // 暗黑模式初始化
-        const savedTheme = localStorage.getItem('theme') || 'light';
-        document.documentElement.classList.toggle('dark-theme', savedTheme === 'dark');
+        // 暗黑模式功能修复
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.classList.toggle('dark-theme', savedTheme === 'dark');
+            
+            document.getElementById('theme-toggle').addEventListener('click', () => {
+                document.documentElement.classList.toggle('dark-theme');
+                localStorage.setItem('theme', 
+                    document.documentElement.classList.contains('dark-theme') ? 'dark' : 'light'
+                );
+            });
+        }
 
         // 知识节点交互
-        document.querySelectorAll('.knowledge-node').forEach(node => {
-            node.addEventListener('click', () => {
-                node.classList.toggle('flipped');
+        document.querySelectorAll('.node').forEach(node => {
+            node.addEventListener('click', function() {
+                this.classList.add('flipped');
                 setTimeout(() => {
-                    window.location.href = node.textContent.trim() + '/';
+                    window.location.href = this.dataset.target;
                 }, 500);
+            });
+        });
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            mermaid.initialize({ 
+                startOnLoad: true,
+                theme: document.documentElement.classList.contains('dark-theme') ? 'dark' : 'neutral'
             });
         });
     </script>
