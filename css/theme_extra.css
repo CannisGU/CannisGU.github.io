@@ -14,9 +14,29 @@
 
 /* 移动端适配 */
 @media (max-width: 768px) {
-  .card {
-    backdrop-filter: blur(5px);
-  }
+  /* 降低基础旋转幅度 */
+.card {
+  transition: transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1); /* 更平缓的缓动曲线 */
+}
+
+.card:hover {
+  transform: 
+    translateY(-3px) /* 原值-5px→-3px */
+    rotateX(3deg)     /* 原值5deg→3deg */
+    rotateY(1deg);    /* 添加垂直平衡旋转 */
+}
+
+/* 确保按钮点击区域 */
+.card a {
+  position: relative;
+  z-index: 10; /* 提升链接层级 */
+  pointer-events: auto; /* 确保可点击 */
+}
+
+/* 知识树保护规则 */
+.mermaid {
+  pointer-events: none; /* 禁止图表交互 */
+}
 }
 /*
  * Wrap inline code samples otherwise they shoot of the side and
