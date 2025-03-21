@@ -1,146 +1,111 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="zh-CN">
 <head>
-    <!-- 新增暗黑模式切换脚本 -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const themeToggle = document.getElementById('theme-toggle');
-            themeToggle.addEventListener('click', () => {
-                document.documentElement.classList.toggle('dark-theme');
-                localStorage.setItem('theme', 
-                    document.documentElement.classList.contains('dark-theme') ? 'dark' : 'light'
-                );
-            });
-        });
-    </script>
-
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="零一学院开源知识共享平台" />
+    <link rel="shortcut icon" href="img/favicon.ico" />
+    <title>零一学院共享知识库</title>
+    <link rel="stylesheet" href="css/theme.css" />
+    <link rel="stylesheet" href="css/theme_extra.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
     <style>
-        /* 新增设计趋势相关CSS */
         :root {
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --primary-gradient: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
             --glass-bg: rgba(255, 255, 255, 0.1);
             --blur-intensity: blur(10px);
         }
 
-        /* 暗黑模式变量 */
         .dark-theme {
-            --background: #121212;
-            --text: #e0e0e0;
-            --glass-bg: rgba(255, 255, 255, 0.05);
+            --background: #0a1929;
+            --text: #e0f2fe;
+            --glass-bg: rgba(18, 18, 18, 0.8);
         }
 
-        /* 玻璃拟态效果 */
-        .wy-nav-side, .card {
-            background: var(--glass-bg);
-            backdrop-filter: var(--blur-intensity);
-            -webkit-backdrop-filter: var(--blur-intensity);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        /* 科技感动态标题 */
+        .sci-fi-header {
+            background: linear-gradient(45deg, 
+                #00f2fe 25%, 
+                #4facfe 50%, 
+                #00f2fe 75%);
+            background-size: 400% 400%;
+            animation: gradientFlow 8s ease infinite;
+            -webkit-background-clip: text;
+            color: transparent;
+            border-bottom: 2px solid #4facfe;
         }
 
-        /* 动态渐变背景 */
-        .gradient-bg {
-            background: var(--primary-gradient);
-            background-size: 200% 200%;
-            animation: gradientFlow 15s ease infinite;
-        }
-
-        @keyframes gradientFlow {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        /* 3D悬停效果 */
-        .card {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        /* 知识树3D节点 */
+        .knowledge-node {
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
             transform-style: preserve-3d;
         }
 
-        .card:hover {
-            transform: translateY(-5px) rotateX(5deg);
-            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+        .knowledge-node.flipped {
+            transform: rotateY(180deg);
         }
 
-        /* 暗黑模式切换按钮 */
-        #theme-toggle {
-            position: fixed;
-            right: 20px;
-            bottom: 20px;
-            padding: 12px;
-            background: var(--glass-bg);
-            border-radius: 50%;
-            cursor: pointer;
-            z-index: 1000;
+        /* 暗黑模式修复 */
+        body.dark-theme {
+            background: var(--background);
+            color: var(--text);
         }
     </style>
 </head>
 
-<body class="wy-body-for-nav" role="document">
-  <!-- 暗黑模式切换按钮 -->
-  <button id="theme-toggle" aria-label="切换主题">
-    <svg width="24" height="24" viewBox="0 0 24 24">
-      <path fill="currentColor" d="M12 18c-3.3 0-6-2.7-6-6s2.7-6 6-6s6 2.7 6 6s-2.7 6-6 6m0-2c2.2 0 4-1.8 4-4s-1.8-4-4-4s-4 1.8-4 4s1.8 4 4 4M8 15h8v-2H8v2z"/>
-    </svg>
-  </button>
+<body class="wy-body-for-nav">
+    <!-- 暗黑模式切换 -->
+    <button id="theme-toggle">
+        <svg width="24" height="24"><path d="M12 18a6 6 0 1 1 0-12 6 6 0 0 1 0 12zM11 1h2v3h-2zM11 20h2v3h-2zM3.5 4.9l1.4 1.4L4.9 7.8 3.5 6.3 2.1 4.9zm14.2 14.2 1.4 1.4-1.4 1.4-1.4-1.4zm-15.1.1h3v2h-3zm17-15.1v3h2v-3z"/></svg>
+    </button>
 
-  <!-- 导航栏玻璃拟态效果 -->
-  <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
-    <!-- 原有导航结构保持不变 -->
-  </nav>
-
-  <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-    <!-- 主内容区优化 -->
-    <div class="wy-nav-content">
-      <div class="rst-content">
-        <!-- 动态渐变标题 -->
-        <h1 class="gradient-bg" style="padding: 20px; border-radius: 12px">
-          欢迎来到零一知识库
-        </h1>
-
-        <!-- 3D卡片效果 -->
-        <div class="row">
-          <div class="col-md-6">
-            <div class="card">
-              <div class="card-body">
-                <h5 class="card-title">学习资源</h5>
-                <!-- 微交互示例：悬浮放大 -->
-                <ul class="hover-scale">
-                  <li><a href="计算机科学/">计算机科学知识树</a></li>
-                  <li><a href="工程技术/">工程实践指南</a></li>
+    <!-- 主内容区 -->
+    <section class="wy-nav-content-wrap">
+        <div class="wy-nav-content">
+            <h1 class="sci-fi-header">欢迎来到零一知识库</h1>
+            
+            <!-- 学习资源板块 -->
+            <div class="card static-card">
+                <h2>学习资源</h2>
+                <ul>
+                    <li><a href="计算机科学/">计算机科学知识树</a></li>
+                    <li><a href="工程技术/">工程实践指南</a></li>
                 </ul>
-              </div>
             </div>
-          </div>
+
+            <!-- 知识树状图 -->
+            <div id="knowledge-tree">
+                <div class="node-root">零一知识库
+                    <div class="node-branch">自然科学
+                        <div class="knowledge-node">力学</div>
+                        <div class="knowledge-node">电磁学</div>
+                    </div>
+                    <div class="node-branch">工程技术
+                        <div class="knowledge-node">机械设计</div>
+                        <div class="knowledge-node">电子工程</div>
+                    </div>
+                </div>
+            </div>
         </div>
+    </section>
 
-        <!-- 玻璃拟态页脚 -->
-        <footer style="background: var(--glass-bg); backdrop-filter: var(--blur-intensity)">
-          <!-- 原有页脚内容 -->
-        </footer>
-      </div>
-    </div>
-  </section>
+    <script>
+        // 暗黑模式初始化
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.classList.toggle('dark-theme', savedTheme === 'dark');
 
-  <!-- 新增动画脚本 -->
-  <script>
-    // 卡片悬停增强
-    document.querySelectorAll('.card').forEach(card => {
-      card.addEventListener('mousemove', (e) => {
-        const rect = card.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        card.style.transform = `
-          perspective(1000px)
-          rotateX(${(y - rect.height/2) / 10}deg)
-          rotateY(${-(x - rect.width/2) / 10}deg)
-        `;
-      });
-
-      card.addEventListener('mouseleave', () => {
-        card.style.transform = 'none';
-      });
-    });
-  </script>
+        // 知识节点交互
+        document.querySelectorAll('.knowledge-node').forEach(node => {
+            node.addEventListener('click', () => {
+                node.classList.toggle('flipped');
+                setTimeout(() => {
+                    window.location.href = node.textContent.trim() + '/';
+                }, 500);
+            });
+        });
+    </script>
 </body>
 </html>
