@@ -1,169 +1,151 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html class="writer-html5" lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>零一知识库</title>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="零一学院开源知识共享平台" />
+    <link rel="shortcut icon" href="img/favicon.ico" />
+    <title>零一学院共享知识库</title>
+    <link rel="stylesheet" href="css/theme.css" />
+    <link rel="stylesheet" href="css/theme_extra.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
     <style>
+        /* 新增科技感设计 */
         :root {
             --primary-blue: #4A90E2;
-            --light-bg: #F8F9FA;
-            --dark-bg: #2D2D2D;
-            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --hover-blue: #357ABD;
+            --glass-bg: rgba(255, 255, 255, 0.1);
         }
 
-        /* 基础布局 */
-        body {
-            margin: 0;
-            font-family: 'Segoe UI', system-ui;
-            background: var(--light-bg);
-            transition: background 0.3s;
+        /* 导航菜单优化 */
+        .wy-menu-vertical li > a {
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
         }
 
-        .container {
-            display: grid;
-            grid-template-columns: 240px 1fr;
-            min-height: 100vh;
+        .wy-menu-vertical li.current > a {
+            border-left-color: var(--primary-blue);
+            background: rgba(74, 144, 226, 0.1);
         }
 
-        /* 导航侧边栏 */
-        .sidebar {
-            background: white;
-            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
-            padding: 24px;
+        /* 知识体系图表 */
+        .mermaid .node rect {
+            fill: #F8F9FA;
+            stroke: var(--primary-blue);
+            rx: 6px;
         }
 
-        .nav-title {
-            color: var(--primary-blue);
-            font-size: 1.5em;
-            margin-bottom: 32px;
-        }
-
-        /* 知识分类卡片 */
-        .knowledge-card {
-            background: white;
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 16px;
-            box-shadow: var(--card-shadow);
-            transition: transform 0.2s;
-            cursor: pointer;
-        }
-
-        .knowledge-card:hover {
-            transform: translateY(-3px);
-        }
-
-        .card-title {
-            color: var(--primary-blue);
-            font-weight: 600;
-        }
-
-        /* 暗黑模式适配 */
-        body.dark-mode {
-            background: var(--dark-bg);
+        /* 暗黑模式修复 */
+        .dark-theme {
+            background: #2D2D2D;
             color: #EEE;
         }
-
-        .dark-mode .sidebar {
-            background: #333;
-        }
-
-        .dark-mode .knowledge-card {
-            background: #444;
-        }
-
-        /* 3D翻转效果 */
-        .flip-card {
-            perspective: 1000px;
-        }
-
-        .flip-card-inner {
-            transition: transform 0.6s;
-            transform-style: preserve-3d;
-        }
-
-        .flip-card:hover .flip-card-inner {
-            transform: rotateY(10deg);
+        .dark-theme .mermaid .node rect {
+            fill: #444;
+            stroke: #82B1FF;
         }
     </style>
 </head>
 
-<body>
-    <!-- 暗黑模式切换 -->
-    <button id="theme-toggle" style="position:fixed; right:20px; bottom:20px">
-        🌓 切换主题
-    </button>
-
-    <div class="container">
-        <!-- 左侧导航 -->
-        <nav class="sidebar">
-            <div class="nav-title">零一知识库</div>
-            
-            <div class="flip-card">
-                <div class="flip-card-inner">
-                    <div class="knowledge-card">
-                        <div class="card-title">自然科学</div>
-                        <ul>
-                            <li>力学</li>
-                            <li>电磁学</li>
-                        </ul>
-                    </div>
+<body class="wy-body-for-nav">
+    <div class="wy-grid-for-nav">
+        <!-- 导航栏结构保持不变 -->
+        <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+            <div class="wy-side-scroll">
+                <div class="wy-side-nav-search">
+                    <a href="." class="icon icon-home">零一学院共享知识库</a>
+                    <form id="rtd-search-form" class="wy-form" action="./search.html" method="get">
+                        <input type="text" name="q" placeholder="搜索文档" aria-label="搜索文档" />
+                    </form>
                 </div>
-            </div>
-
-            <div class="flip-card">
-                <div class="flip-card-inner">
-                    <div class="knowledge-card">
-                        <div class="card-title">工程技术</div>
-                        <ul>
-                            <li>机械设计</li>
-                            <li>电子工程</li>
-                        </ul>
-                    </div>
+                <div class="wy-menu wy-menu-vertical" data-spy="affix">
+                    <ul>
+                        <li class="toctree-l1"><a href="#welcome">欢迎页</a></li>
+                        <li class="toctree-l1"><a href="#contribute">贡献指南</a></li>
+                        <li class="toctree-l1"><a href="#structure">知识体系</a>
+                            <ul>
+                                <li class="toctree-l2"><a href="自然科学/">自然科学
+                                    <ul>
+                                        <li><a href="力学/">力学</a></li>
+                                        <li><a href="电磁学/">电磁学</a></li>
+                                    </ul>
+                                </a></li>
+                                <li class="toctree-l2"><a href="工程技术/">工程技术
+                                    <ul>
+                                        <li><a href="机械设计/">机械设计</a></li>
+                                        <li><a href="电子工程/">电子工程</a></li>
+                                    </ul>
+                                </a></li>
+                            </ul>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </nav>
 
-        <!-- 右侧内容区 -->
-        <main style="padding:32px">
-            <h1 style="color:var(--primary-blue)">欢迎来到零一知识库</h1>
-            
-            <!-- 知识树结构 -->
-            <div style="margin-top:32px">
-                <div class="knowledge-card">
-                    <h2>计算机科学知识树</h2>
-                    <ul>
-                        <li>编程语言</li>
-                        <li>算法与数据结构</li>
-                    </ul>
-                </div>
+        <!-- 主内容区优化 -->
+        <section class="wy-nav-content-wrap">
+            <div class="wy-nav-content">
+                <div class="rst-content">
+                    <h1 id="welcome">欢迎来到零一知识库</h1>
+                    <div class="admonition note">
+                        <p>最新公告：平台正在持续建设中，欢迎参与贡献！</p>
+                    </div>
 
-                <div class="knowledge-card">
-                    <h2>工程实践指南</h2>
-                    <ul>
-                        <li>项目规范</li>
-                        <li>开发流程</li>
-                    </ul>
+                    <!-- 双栏布局保持原样 -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card hover-card">
+                                <div class="card-body">
+                                    <h5>学习资源</h5>
+                                    <ul class="tech-list">
+                                        <li><a href="计算机科学/">
+                                            <span class="icon">🧠</span>
+                                            计算机科学知识树
+                                        </a></li>
+                                        <li><a href="工程技术/">
+                                            <span class="icon">🔧</span>
+                                            工程实践指南
+                                        </a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 更新知识体系图表 -->
+                    <h2 id="structure">知识体系架构</h2>
+                    <div class="mermaid">
+                        graph TD
+                        A[零一知识库] --> B[自然科学]
+                        A --> C[工程技术]
+                        B --> B1[力学]
+                        B --> B2[电磁学]
+                        C --> C1[机械设计]
+                        C --> C2[电子工程]
+                    </div>
                 </div>
             </div>
-        </main>
+        </section>
     </div>
 
+    <!-- 暗黑模式修复 -->
     <script>
-        // 暗黑模式切换
-        const themeToggle = document.getElementById('theme-toggle');
-        themeToggle.addEventListener('click', () => {
-            document.body.classList.toggle('dark-mode');
-        });
+        // 初始化主题
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.classList.toggle('dark-theme', savedTheme === 'dark');
 
-        // 卡片交互效果
-        document.querySelectorAll('.knowledge-card').forEach(card => {
-            card.addEventListener('click', function() {
-                this.style.transform = 'scale(0.98)';
-                setTimeout(() => {
-                    this.style.transform = '';
-                }, 200);
+        // 主题切换功能
+        document.getElementById('theme-toggle').addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark-theme');
+            localStorage.setItem('theme', 
+                document.documentElement.classList.contains('dark-theme') ? 'dark' : 'light'
+            );
+            // 刷新图表主题
+            mermaid.initialize({ 
+                theme: document.documentElement.classList.contains('dark-theme') ? 'dark' : 'neutral'
             });
         });
     </script>
