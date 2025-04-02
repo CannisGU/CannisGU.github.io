@@ -1,152 +1,398 @@
-<!DOCTYPE html>
-<html class="writer-html5" lang="zh-CN">
+<!doctype html>
+<html lang="zh-CN">
 <head>
-    <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="零一学院开源知识共享平台" />
     <link rel="shortcut icon" href="img/favicon.ico" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title>零一学院共享知识库</title>
-    <link rel="stylesheet" href="css/theme.css" />
+	<link rel="stylesheet" href="css/theme.css" />
     <link rel="stylesheet" href="css/theme_extra.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
-    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config = { darkMode: 'class' }</script>
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        /* 新增科技感设计 */
+        @import "https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap";
         :root {
-            --primary-blue: #4A90E2;
-            --hover-blue: #357ABD;
-            --glass-bg: rgba(255, 255, 255, 0.1);
+            --primary: #5e6ad2;
+            --primary-light: #8a94e9;
+            --secondary: #0f172a;
+            --accent: #3b82f6;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --bg-light: #f8fafc;
+            --card-bg: #fff;
+            --border: #e2e8f0;
+        }
+        .dark {
+            --primary: #8a94e9;
+            --primary-light: #5e6ad2;
+            --secondary: #f8fafc;
+            --accent: #3b82f6;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --bg-light: #0f172a;
+            --card-bg: #1e293b;
+            --border: #334155;
+        }
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-primary);
+            font-family: 'Noto Sans SC', sans-serif;
+            transition: background-color 0.5s ease, color 0.5s ease;
+            position: relative;
+            overflow-x: hidden;
+        }
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            transition: all 0.5s ease;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.05);
+        }
+        .btn {
+            transition: all 0.2s;
+            position: relative;
+        }
+        .btn:hover {
+            transform: scale(1.05);
+            border: 2px solid var(--primary);
+            border-radius: 0.5rem;
+        }
+        .fade-in {
+            animation: 0.8s ease-in fadeIn;
+        }
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .section-title {
+            margin-bottom: 1.5rem;
+            display: inline-block;
+            position: relative;
+        }
+        .section-title:after {
+            content: "";
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+            border-radius: 2px;
+            width: 60px;
+            height: 4px;
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+        }
+        .code-block {
+            background-color: rgba(0, 0, 0, 0.1);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            font-family: Menlo, Monaco, Courier New, monospace;
+            overflow-x: auto;
+        }
+        .dark .code-block {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        .tech-icon {
+            transition: all 0.3s;
+        }
+        .tech-icon:hover {
+            color: var(--primary);
+            transform: scale(1.1);
+        }
+        .progress-bar {
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+            border-radius: 3px;
+            height: 6px;
+        }
+        .step-number {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: #fff;
+            border-radius: 50%;
+            justify-content: center;
+            align-items: center;
+            width: 36px;
+            height: 36px;
+            font-weight: 700;
+            display: flex;
+        }
+        .table-container {
+            overflow-x: auto;
+        }
+        table {
+            border-collapse: separate;
+            border-spacing: 0;
+            width: 100%;
+        }
+        th, td {
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+            padding: 0.75rem 1rem;
+        }
+        th {
+            background-color: rgba(0, 0, 0, 0.1);
+            font-weight: 600;
+        }
+        .dark th {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        .search-bar {
+            margin: 20px 0;
+        }
+        .search-input {
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            width: 100%;
+            transition: border-color 0.2s;
+        }
+        .search-input:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+        .search-button {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 0.5rem;
+            background-color: var(--primary);
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .search-button:hover {
+            background-color: var(--primary-light);
+        }
+        
+        /* 新增的主题切换动画样式 */
+        .theme-transition-mask {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 200%;
+            height: 200%;
+            background-color: var(--bg-light);
+            transform: translate(-100%, 100%) rotate(45deg);
+            transform-origin: center;
+            transition: transform 0.8s ease-in-out;
+            z-index: 9999;
+            pointer-events: none;
+            mix-blend-mode: difference;
+        }
+        
+        .dark .theme-transition-mask {
+            transform: translate(0, 0) rotate(45deg);
+        }
+        
+        /* 新增的分隔线样式 */
+        .section-divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border), transparent);
+            margin: 3rem 0;
+            position: relative;
+        }
+        
+        .section-divider::after {
+            content: "✦";
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            background-color: var(--bg-light);
+            padding: 0 1rem;
+            color: var(--primary);
+        }
+        
+        /* 新增的子版块卡片悬停效果 */
+        .sub-card {
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
         }
 
-        /* 导航菜单优化 */
-        .wy-menu-vertical li > a {
-            transition: all 0.3s ease;
-            border-left: 3px solid transparent;
+        .sub-card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            z-index: -1;
+            background: linear-gradient(45deg, 
+                var(--primary), 
+                var(--primary-light), 
+                #5e6ad2, 
+                #8a94e9);
+            background-size: 400% 400%;
+            border-radius: 0.6rem;
+            opacity: 0;
+            transition: all 0.5s ease;
         }
 
-        .wy-menu-vertical li.current > a {
-            border-left-color: var(--primary-blue);
-            background: rgba(74, 144, 226, 0.1);
+        .sub-card:hover::before {
+            opacity: 1;
+            animation: gradientBorder 3s ease infinite;
         }
 
-        /* 知识体系图表 */
-        .mermaid .node rect {
-            fill: #F8F9FA;
-            stroke: var(--primary-blue);
-            rx: 6px;
+        @keyframes gradientBorder {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
-        /* 暗黑模式修复 */
-        .dark-theme {
-            background: #2D2D2D;
-            color: #EEE;
+        .sub-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
         }
-        .dark-theme .mermaid .node rect {
-            fill: #444;
-            stroke: #82B1FF;
+
+        /* 标志图片样式 */
+        .logo-img {
+            height: 40px;
+            margin-right: 12px;
+            transition: filter 0.3s ease;
+        }
+        
+        .dark .logo-img {
+            filter: brightness(0) invert(1);
         }
     </style>
 </head>
+<body class="min-h-screen">
+    <!-- 主题切换遮罩层 -->
+    <div class="theme-transition-mask"></div>
+    
+    <header class="sticky top-0 z-50 bg-opacity-90 backdrop-blur-sm" style="background-color: var(--card-bg)">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center">
+                <!-- 零一学院标志 - 实际使用时请替换为您的图片URL -->
+                <img src="零一学院标志-浅色.png" alt="零一学院标志" class="h-10 mr-3 dark:hidden" />
+		<img src="零一学院标志-深色.png" alt="零一学院标志" class="h-10 mr-3 hidden dark:block" />
+                <h1 class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">零一学院知识库</h1>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button class="btn p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-all" id="theme-toggle" aria-label="切换主题">
+                    <i class="fas fa-moon dark:hidden" aria-hidden="true"></i>
+                    <i class="fas fa-sun hidden dark:block" aria-hidden="true"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+    <main class="container mx-auto px-4 py-8 max-w-6xl">
+        <section class="mb-12 fade-in">
+            <div class="search-bar">
+                <input type="text" class="search-input" placeholder="请输入关键词进行检索..." aria-label="搜索" />
+                <button class="search-button">检索</button>
+            </div>
 
-<body class="wy-body-for-nav">
-    <div class="wy-grid-for-nav">
-        <!-- 导航栏结构保持不变 -->
-        <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
-            <div class="wy-side-scroll">
-                <div class="wy-side-nav-search">
-                    <a href="." class="icon icon-home">零一学院共享知识库</a>
-                    <form id="rtd-search-form" class="wy-form" action="./search.html" method="get">
-                        <input type="text" name="q" placeholder="搜索文档" aria-label="搜索文档" />
-                    </form>
-                </div>
-                <div class="wy-menu wy-menu-vertical" data-spy="affix">
-                    <ul>
-                        <li class="toctree-l1"><a href="#welcome">欢迎页</a></li>
-                        <li class="toctree-l1"><a href="#contribute">贡献指南</a></li>
-                        <li class="toctree-l1"><a href="#structure">知识体系</a>
-                            <ul>
-                                <li class="toctree-l2"><a href="自然科学/">自然科学
-                                    <ul>
-                                        <li><a href="力学/">力学</a></li>
-                                        <li><a href="电磁学/">电磁学</a></li>
-                                    </ul>
-                                </a></li>
-                                <li class="toctree-l2"><a href="工程技术/">工程技术
-                                    <ul>
-                                        <li><a href="机械设计/">机械设计</a></li>
-                                        <li><a href="电子工程/">电子工程</a></li>
-                                    </ul>
-                                </a></li>
-                            </ul>
-                        </li>
-                    </ul>
+            <!-- 知识库模块部分 -->
+            <div class="card rounded-lg p-6 bg-gradient-to-r from-blue-100 to-purple-50 dark:from-blue-800/20 dark:to-purple-800/20 mb-8">
+                <h2 class="text-2xl font-bold mb-4">零一学院知识库模块</h2>
+                <p class="text-lg text-gray-700 dark:text-gray-300 mb-6">零一学院知识库包含多个功能模块，为学生和教师提供全面的知识管理和交流平台。</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div class="card sub-card p-4 rounded-lg">
+                        <div class="flex items-center mb-2">
+                            <i class="fas fa-sitemap text-blue-500 mr-2"></i>
+                            <h3 class="font-semibold">零一TALK</h3>
+                        </div>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">零一学院的内部论坛</p>
+                    </div>
+                    <div class="card sub-card p-4 rounded-lg">
+                        <div class="flex items-center mb-2">
+                            <i class="fas fa-project-diagram text-purple-500 mr-2"></i>
+                            <h3 class="font-semibold">知识网状图谱</h3>
+                        </div>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">通过Markdown双向链接与标签系统，建立知识点之间的关联网络</p>
+                    </div>
+                    <div class="card sub-card p-4 rounded-lg">
+                        <div class="flex items-center mb-2">
+                            <i class="fas fa-rocket text-green-500 mr-2"></i>
+                            <h3 class="font-semibold">内容创作</h3>
+                        </div>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">欢迎零一学子踊跃分享灵感和思考</p>
+                    </div>
                 </div>
             </div>
-        </nav>
 
-        <!-- 主内容区优化 -->
-        <section class="wy-nav-content-wrap">
-            <div class="wy-nav-content">
-                <div class="rst-content">
-                    <h1 id="welcome">欢迎来到零一知识库</h1>
-                    <div class="admonition note">
-                        <p>最新公告：平台正在持续建设中，欢迎参与贡献！</p>
-                    </div>
+            <!-- 分隔线 -->
+            <div class="section-divider"></div>
 
-                    <!-- 双栏布局保持原样 -->
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="card hover-card">
-                                <div class="card-body">
-                                    <h5>学习资源</h5>
-                                    <ul class="tech-list">
-                                        <li><a href="计算机科学/">
-                                            <span class="icon">🧠</span>
-                                            计算机科学知识树
-                                        </a></li>
-                                        <li><a href="工程技术/">
-                                            <span class="icon">🔧</span>
-                                            工程实践指南
-                                        </a></li>
-                                    </ul>
-                                </div>
-                            </div>
+            <!-- 构建方案部分 -->
+            <div class="card rounded-lg p-6 bg-gradient-to-r from-blue-100 to-purple-50 dark:from-blue-800/20 dark:to-purple-800/20 mt-8">
+                <h2 class="text-2xl font-bold mb-4">零一学院知识库网站构建方案</h2>
+                <p class="text-lg text-gray-700 dark:text-gray-300 mb-6">本方案旨在基于GitHub平台，为零一学院构建一个分类清晰、知识点相互关联、界面科技感的知识库网站。通过结合静态站点生成器、现代前端框架和自动化部署工具，打造一个专业、高效的知识管理平台。</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div class="card sub-card p-4 rounded-lg">
+                        <div class="flex items-center mb-2">
+                            <i class="fas fa-sitemap text-blue-500 mr-2"></i>
+                            <h3 class="font-semibold">分类清晰</h3>
                         </div>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">采用分层结构与标签系统，实现知识的有序组织与检索</p>
                     </div>
-
-                    <!-- 更新知识体系图表 -->
-                    <h2 id="structure">知识体系架构</h2>
-                    <div class="mermaid">
-                        graph TD
-                        A[零一知识库] --> B[自然科学]
-                        A --> C[工程技术]
-                        B --> B1[力学]
-                        B --> B2[电磁学]
-                        C --> C1[机械设计]
-                        C --> C2[电子工程]
+                    <div class="card sub-card p-4 rounded-lg">
+                        <div class="flex items-center mb-2">
+                            <i class="fas fa-project-diagram text-purple-500 mr-2"></i>
+                            <h3 class="font-semibold">网状关联</h3>
+                        </div>
+                        <p class="text-sm text-gray-6 00 dark:text-gray-400">通过Markdown双向链接与标签系统，建立知识点之间的关联网络</p>
+                    </div>
+                    <div class="card sub-card p-4 rounded-lg">
+                        <div class="flex items-center mb-2">
+                            <i class="fas fa-rocket text-green-500 mr-2"></i>
+                            <h3 class="font-semibold">科技感界面</h3>
+                        </div>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">使用Tailwind CSS打造现代、响应式界面，提升用户体验</p>
                     </div>
                 </div>
             </div>
         </section>
-    </div>
 
-    <!-- 暗黑模式修复 -->
+        <!-- 分隔线 -->
+        <div class="section-divider"></div>
+    </main>
+    <footer class="bg-gray-100 dark:bg-gray-800 py-8">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0">
+                    <h3 class="text-lg font-semibold mb-2">零一学院知识库网站构建方案</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">基于GitHub的现代知识管理系统</p>
+                </div>
+                <div class="text-center md:text-right">
+                    <p class="text-sm text-gray-600 dark:text-gray-400">作者：Cannis؄GU</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-500 mt-1">© 2025 版权所有</p>
+                </div>
+            </div>
+        </div>
+    </footer>
     <script>
-        // 初始化主题
-        const savedTheme = localStorage.getItem('theme') || 'light';
-        document.documentElement.classList.toggle('dark-theme', savedTheme === 'dark');
-
-        // 主题切换功能
-        document.getElementById('theme-toggle').addEventListener('click', () => {
-            document.documentElement.classList.toggle('dark-theme');
-            localStorage.setItem('theme', 
-                document.documentElement.classList.contains('dark-theme') ? 'dark' : 'light'
-            );
-            // 刷新图表主题
-            mermaid.initialize({ 
-                theme: document.documentElement.classList.contains('dark-theme') ? 'dark' : 'neutral'
+        const themeToggle = document.getElementById('theme-toggle');
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+        
+        themeToggle.addEventListener('click', () => {
+            // 强制重新绘制DOM以确保动画开始
+            document.body.offsetHeight;
+            
+            document.documentElement.classList.toggle('dark');
+        });
+        
+        const fadeElements = document.querySelectorAll('.fade-in');
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = 1;
+                    entry.target.style.transform = 'translateY(0)';
+                }
             });
+        }, { threshold: 0.1 });
+        
+        fadeElements.forEach(element => {
+            element.style.opacity = 0;
+            element.style.transform = 'translateY(20px)';
+            element.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(element);
         });
     </script>
 </body>
