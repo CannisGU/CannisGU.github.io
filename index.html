@@ -11,6 +11,20 @@
 	<link rel="stylesheet" href="css/theme.css" />
     <link rel="stylesheet" href="css/theme_extra.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+
+	<script>
+        // Current page data
+        var mkdocs_page_name = "\u6d59\u6c5f\u5927\u5b66\u8bfe\u7a0b\u653b\u7565\u5171\u4eab\u8ba1\u5212";
+        var mkdocs_page_input_path = "index.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script>tailwind.config = { darkMode: 'class' }</script>
     <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -282,8 +296,11 @@
     <main class="container mx-auto px-4 py-8 max-w-6xl">
         <section class="mb-12 fade-in">
             <div class="search-bar">
-                <input type="text" class="search-input" placeholder="请输入关键词进行检索..." aria-label="搜索" />
+		 </a><div role="search">
+		 <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
+    		 <input type="text" class="search-input" placeholder="请输入关键词进行检索..." aria-label="搜索" />
                 <button class="search-button">检索</button>
+ 		 </form>
             </div>
 
             <!-- 知识库模块部分 -->
@@ -348,6 +365,77 @@
             </div>
         </section>
 
+	<div class="card rounded-lg p-6 bg-gradient-to-r from-blue-100 to-purple-50 dark:from-blue-800/20 dark:to-purple-800/20 mb-8">
+    <!-- 主标题升级 -->
+    <h1 class="text-3xl font-extrabold mb-6" id="_1">零一学院共享知识库</h1>
+    
+    <!-- 项目背景作为特殊提示卡 -->
+    <div class="card sub-card p-4 rounded-lg bg-blue-50/50 dark:bg-blue-900/20 mb-6">
+        <h2 class="text-xl font-semibold mb-3" id="_2">🚀 项目背景</h2>
+        <p class="text-gray-700 dark:text-gray-300 leading-relaxed">
+            我们致力于打造开放共享的学习资源平台，通过集体智慧汇集课程资料、学习心得和技术实践，帮助学习者减少重复探索，快速获取优质学习资源。
+        </p>
+    </div>
+
+    <!-- 平台特色三列布局 -->
+    <h2 class="text-2xl font-bold mb-4" id="_3">✨ 平台特色</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div class="card sub-card p-4 rounded-lg">
+            <div class="flex items-center mb-2">
+                <i class="fas fa-book-open text-blue-500 mr-2"></i>
+                <h3 class="font-semibold">结构化知识体系</h3>
+            </div>
+            <p class="text-sm text-gray-600 dark:text-gray-400">层级清晰的Wiki式文档架构</p>
+        </div>
+        <div class="card sub-card p-4 rounded-lg">
+            <div class="flex items-center mb-2">
+                <i class="fas fa-sync-alt text-purple-500 mr-2"></i>
+                <h3 class="font-semibold">持续更新</h3>
+            </div>
+            <p class="text-sm text-gray-600 dark:text-gray-400">社区驱动的资源进化机制</p>
+        </div>
+        <div class="card sub-card p-4 rounded-lg">
+            <div class="flex items-center mb-2">
+                <i class="fab fa-github text-green-500 mr-2"></i>
+                <h3 class="font-semibold">协作共建</h3>
+            </div>
+            <p class="text-sm text-gray-600 dark:text-gray-400">GitHub驱动的协同编辑流程</p>
+        </div>
+    </div>
+
+    <!-- 参与贡献双列布局 -->
+    <h2 class="text-2xl font-bold mb-4" id="_4">👥 参与贡献</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div class="card sub-card p-4 rounded-lg">
+            <div class="flex items-center mb-2">
+                <i class="fas fa-code-branch text-yellow-500 mr-2"></i>
+                <h3 class="font-semibold">主要贡献方式</h3>
+            </div>
+            <ul class="list-disc pl-5 text-sm text-gray-600 dark:text-gray-400">
+                <li>提交学习笔记和实验报告</li>
+                <li>分享项目实践案例</li>
+                <li>完善文档组织结构</li>
+            </ul>
+        </div>
+        <div class="card sub-card p-4 rounded-lg">
+            <div class="flex items-center mb-2">
+                <i class="fas fa-balance-scale text-pink-500 mr-2"></i>
+                <h3 class="font-semibold" id="_5">许可协议</h3>
+            </div>
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+                采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" 
+                      class="text-blue-600 hover:underline dark:text-blue-400"
+                      target="_blank">CC-BY-NC-SA 4.0</a> 协议
+                <ul class="list-[lower-roman] pl-5 mt-2 text-xs">
+                    <li>署名原作者</li>
+                    <li>非商业性使用</li>
+                    <li>相同方式共享</li>
+                </ul>
+            </p>
+        </div>
+    </div>
+</div>
+
         <!-- 分隔线 -->
         <div class="section-divider"></div>
     </main>
@@ -356,7 +444,7 @@
             <div class="flex flex-col md:flex-row justify-between items-center">
                 <div class="mb-4 md:mb-0">
                     <h3 class="text-lg font-semibold mb-2">零一学院知识库网站构建方案</h3>
-                    <p class="text-sm text-gray-600 dark:text-gray-400">基于GitHub的现代知识管理系统</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">基于GitHub的现代知识管理系统| 使用 <a href="https://www.mkdocs.org/">MkDocs</a> 构建</p>
                 </div>
                 <div class="text-center md:text-right">
                     <p class="text-sm text-gray-600 dark:text-gray-400">作者：Cannis؄GU</p>
