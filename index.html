@@ -1,487 +1,1321 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="零一学院开源知识共享平台" />
-    <link rel="shortcut icon" href="img/favicon.ico" />
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>零一学院共享知识库</title>
-	<link rel="stylesheet" href="css/theme.css" />
-    <link rel="stylesheet" href="css/theme_extra.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
-
-	<script>
-        // Current page data
-        var mkdocs_page_name = "\u6d59\u6c5f\u5927\u5b66\u8bfe\u7a0b\u653b\u7565\u5171\u4eab\u8ba1\u5212";
-        var mkdocs_page_input_path = "index.md";
-        var mkdocs_page_url = null;
-      </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>粒子土星 | 交互式太空体验</title>
     
-    <!--[if lt IE 9]>
-      <script src="js/html5shiv.min.js"></script>
-    <![endif]-->
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
-      <script>hljs.highlightAll();</script> 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>tailwind.config = { darkMode: 'class' }</script>
-    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        @import "https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap";
         :root {
-            --primary: #5e6ad2;
-            --primary-light: #8a94e9;
-            --secondary: #0f172a;
-            --accent: #3b82f6;
-            --text-primary: #1e293b;
-            --text-secondary: #64748b;
-            --bg-light: #f8fafc;
-            --card-bg: #fff;
-            --border: #e2e8f0;
-        }
-        .dark {
-            --primary: #8a94e9;
-            --primary-light: #5e6ad2;
-            --secondary: #f8fafc;
-            --accent: #3b82f6;
-            --text-primary: #f1f5f9;
-            --text-secondary: #cbd5e1;
-            --bg-light: #0f172a;
-            --card-bg: #1e293b;
-            --border: #334155;
-        }
-        body {
-            background-color: var(--bg-light);
-            color: var(--text-primary);
-            font-family: 'Noto Sans SC', sans-serif;
-            transition: background-color 0.5s ease, color 0.5s ease;
-            position: relative;
-            overflow-x: hidden;
-        }
-        .card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border);
-            transition: all 0.5s ease;
-        }
-        .card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.05);
-        }
-        .btn {
-            transition: all 0.2s;
-            position: relative;
-        }
-        .btn:hover {
-            transform: scale(1.05);
-            border: 2px solid var(--primary);
-            border-radius: 0.5rem;
-        }
-        .fade-in {
-            animation: 0.8s ease-in fadeIn;
-        }
-        @keyframes fadeIn {
-            0% { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .section-title {
-            margin-bottom: 1.5rem;
-            display: inline-block;
-            position: relative;
-        }
-        .section-title:after {
-            content: "";
-            background: linear-gradient(90deg, var(--primary), var(--primary-light));
-            border-radius: 2px;
-            width: 60px;
-            height: 4px;
-            position: absolute;
-            bottom: -8px;
-            left: 0;
-        }
-        .code-block {
-            background-color: rgba(0, 0, 0, 0.1);
-            border-radius: 0.5rem;
-            padding: 1rem;
-            font-family: Menlo, Monaco, Courier New, monospace;
-            overflow-x: auto;
-        }
-        .dark .code-block {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-        .tech-icon {
-            transition: all 0.3s;
-        }
-        .tech-icon:hover {
-            color: var(--primary);
-            transform: scale(1.1);
-        }
-        .progress-bar {
-            background: linear-gradient(90deg, var(--primary), var(--primary-light));
-            border-radius: 3px;
-            height: 6px;
-        }
-        .step-number {
-            background: linear-gradient(135deg, var(--primary), var(--primary-light));
-            color: #fff;
-            border-radius: 50%;
-            justify-content: center;
-            align-items: center;
-            width: 36px;
-            height: 36px;
-            font-weight: 700;
-            display: flex;
-        }
-        .table-container {
-            overflow-x: auto;
-        }
-        table {
-            border-collapse: separate;
-            border-spacing: 0;
-            width: 100%;
-        }
-        th, td {
-            text-align: left;
-            border-bottom: 1px solid var(--border);
-            padding: 0.75rem 1rem;
-        }
-        th {
-            background-color: rgba(0, 0, 0, 0.1);
-            font-weight: 600;
-        }
-        .dark th {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-        .search-bar {
-            margin: 20px 0;
-        }
-        .search-input {
-            border: 1px solid var(--border);
-            border-radius: 0.5rem;
-            padding: 0.5rem;
-            width: 100%;
-            transition: border-color 0.2s;
-        }
-        .search-input:focus {
-            border-color: var(--primary);
-            outline: none;
-        }
-        .search-button {
-            padding: 0.5rem 1rem;
-            border: none;
-            border-radius: 0.5rem;
-            background-color: var(--primary);
-            color: white;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        .search-button:hover {
-            background-color: var(--primary-light);
+            --primary-gold: #c5a059;
+            --deep-space: #050505;
+            --ui-bg: rgba(5, 5, 5, 0.7);
+            --transition-speed: 0.4s;
         }
         
-        /* 新增的主题切换动画样式 */
-        .theme-transition-mask {
-            position: fixed;
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: var(--deep-space);
+            font-family: 'Microsoft YaHei', 'Segoe UI', sans-serif;
+            color: white;
+            user-select: none;
+        }
+
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+            position: absolute;
             top: 0;
             left: 0;
-            width: 200%;
-            height: 200%;
-            background-color: var(--bg-light);
-            transform: translate(-100%, 100%) rotate(45deg);
-            transform-origin: center;
-            transition: transform 0.8s ease-in-out;
-            z-index: 9999;
-            pointer-events: none;
-            mix-blend-mode: difference;
-        }
-        
-        .dark .theme-transition-mask {
-            transform: translate(0, 0) rotate(45deg);
-        }
-        
-        /* 新增的分隔线样式 */
-        .section-divider {
-            height: 1px;
-            background: linear-gradient(90deg, transparent, var(--border), transparent);
-            margin: 3rem 0;
-            position: relative;
-        }
-        
-        .section-divider::after {
-            content: "✦";
-            position: absolute;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            background-color: var(--bg-light);
-            padding: 0 1rem;
-            color: var(--primary);
-        }
-        
-        /* 新增的子版块卡片悬停效果 */
-        .sub-card {
-            position: relative;
-            overflow: hidden;
             z-index: 1;
+            background: radial-gradient(circle at center, #050505 0%, #0b0b10 100%);
         }
 
-        .sub-card::before {
-            content: '';
+        #ui-layer {
             position: absolute;
-            top: -2px;
-            left: -2px;
-            right: -2px;
-            bottom: -2px;
-            z-index: -1;
-            background: linear-gradient(45deg, 
-                var(--primary), 
-                var(--primary-light), 
-                #5e6ad2, 
-                #8a94e9);
-            background-size: 400% 400%;
-            border-radius: 0.6rem;
-            opacity: 0;
-            transition: all 0.5s ease;
+            top: 30px;
+            left: 30px;
+            z-index: 10;
+            pointer-events: none;
+            transition: opacity var(--transition-speed);
         }
 
-        .sub-card:hover::before {
-            opacity: 1;
-            animation: gradientBorder 3s ease infinite;
+        .glass-panel {
+            background: var(--ui-bg);
+            backdrop-filter: blur(12px);
+            padding: 24px;
+            border-radius: 8px;
+            border-left: 2px solid var(--primary-gold);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.9);
+            max-width: 280px;
+            transition: transform var(--transition-speed);
         }
 
-        @keyframes gradientBorder {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        .sub-card:hover {
+        .glass-panel:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
         }
 
-        /* 标志图片样式 */
-        .logo-img {
-            height: 40px;
-            margin-right: 12px;
-            transition: filter 0.3s ease;
+        h1 {
+            font-weight: 200;
+            font-size: 1.8rem;
+            margin: 0 0 10px 0;
+            color: #e0cda7;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+        }
+
+        .status-text {
+            font-size: 0.85rem;
+            color: #888;
+            line-height: 1.6;
+            font-family: monospace;
+        }
+
+        .highlight {
+            color: var(--primary-gold);
+            font-weight: bold;
+        }
+
+        #controls {
+            position: absolute;
+            bottom: 40px;
+            right: 40px;
+            z-index: 10;
+            pointer-events: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        #author-btn {
+            position: absolute;
+            top: 40px;
+            right: 40px;
+            z-index: 20;
+            pointer-events: auto;
+            text-decoration: none;
+            color: var(--primary-gold);
+            border: 1px solid rgba(197, 160, 89, 0.4);
+            background: rgba(0, 0, 0, 0.6);
+            padding: 8px 20px;
+            font-size: 0.8rem;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(4px);
+            letter-spacing: 1px;
+            font-family: monospace;
+        }
+
+        #author-btn:hover {
+            background: var(--primary-gold);
+            color: #000;
+            box-shadow: 0 0 15px rgba(197, 160, 89, 0.4);
+        }
+
+        button {
+            background: transparent;
+            border: 1px solid rgba(197, 160, 89, 0.3);
+            color: var(--primary-gold);
+            padding: 12px 30px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-radius: 4px;
+            backdrop-filter: blur(4px);
+        }
+
+        button:hover {
+            background: rgba(197, 160, 89, 0.1);
+            border-color: var(--primary-gold);
+            box-shadow: 0 0 15px rgba(197, 160, 89, 0.2);
+        }
+
+        button.active {
+            background: rgba(197, 160, 89, 0.2);
+            border-color: var(--primary-gold);
+            box-shadow: 0 0 10px rgba(197, 160, 89, 0.3);
+        }
+
+        #loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 20;
+            text-align: center;
+            color: #444;
+            font-size: 0.8rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            transition: opacity 0.5s;
         }
         
-        .dark .logo-img {
-            filter: brightness(0) invert(1);
+        #fps-counter {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: #666;
+            font-family: monospace;
+            font-size: 10px;
+            z-index: 5;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 5px 10px;
+            border-radius: 3px;
+        }
+
+        #performance-panel {
+            position: absolute;
+            bottom: 40px;
+            left: 30px;
+            z-index: 10;
+            pointer-events: auto;
+        }
+
+        .performance-option {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+
+        .performance-option input {
+            margin-right: 10px;
+        }
+
+        .performance-option label {
+            font-size: 0.8rem;
+            color: #aaa;
+            cursor: pointer;
+        }
+
+        #gesture-guide {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 15;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            max-width: 300px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(197, 160, 89, 0.3);
+            transition: opacity 0.5s;
+        }
+
+        #gesture-guide.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #gesture-guide h3 {
+            color: var(--primary-gold);
+            margin-top: 0;
+        }
+
+        .gesture-demo {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+        }
+
+        .gesture-item {
+            text-align: center;
+        }
+
+        .gesture-icon {
+            width: 60px;
+            height: 60px;
+            background: rgba(197, 160, 89, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            font-size: 24px;
+        }
+
+        .input_video { 
+            display: none; 
+        }
+
+        #info-panel {
+            position: absolute;
+            top: 30px;
+            right: 150px;
+            z-index: 10;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity var(--transition-speed);
+        }
+
+        #info-panel.visible {
+            opacity: 1;
+        }
+
+        .notification {
+            background: var(--ui-bg);
+            backdrop-filter: blur(12px);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 2px solid var(--primary-gold);
+            max-width: 250px;
+            font-size: 0.8rem;
+        }
+
+        #camera-permission {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 25;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            max-width: 400px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(197, 160, 89, 0.3);
+        }
+
+        #camera-permission.hidden {
+            display: none;
+        }
+
+        #camera-permission h3 {
+            color: var(--primary-gold);
+            margin-top: 0;
+        }
+
+        #hand-preview {
+            width: 200px;
+            height: 150px;
+            background: rgba(255, 255, 255, 0.05);
+            margin: 15px auto;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #888;
+            font-size: 14px;
         }
     </style>
 </head>
-<body class="min-h-screen">
-    <!-- 主题切换遮罩层 -->
-    <div class="theme-transition-mask"></div>
+<body>
+
+    <video class="input_video"></video>
     
-    <header class="sticky top-0 z-50 bg-opacity-90 backdrop-blur-sm" style="background-color: var(--card-bg)">
-        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-            <div class="flex items-center">
-                <!-- 零一学院标志 - 实际使用时请替换为您的图片URL -->
-                <img src="https://github.com/CannisGU/CannisGU.github.io/blob/main/%E9%9B%B6%E4%B8%80%E5%AD%A6%E9%99%A2%E6%A0%87%E5%BF%97-%E6%B5%85%E8%89%B2.png" alt="零一学院标志" class="h-10 mr-3 dark:hidden" />
-		<img src="https://github.com/CannisGU/CannisGU.github.io/blob/main/%E9%9B%B6%E4%B8%80%E5%AD%A6%E9%99%A2%E6%A0%87%E5%BF%97-%E6%B7%B1%E8%89%B2.png" alt="零一学院标志" class="h-10 mr-3 hidden dark:block" />
-                <h1 class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">零一学院知识库</h1>
-            </div>
-            <div class="flex items-center space-x-4">
-                <button class="btn p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-all" id="theme-toggle" aria-label="切换主题">
-                    <i class="fas fa-moon dark:hidden" aria-hidden="true"></i>
-                    <i class="fas fa-sun hidden dark:block" aria-hidden="true"></i>
-                </button>
-            </div>
-        </div>
-    </header>
-    <main class="container mx-auto px-4 py-8 max-w-6xl">
-        <section class="mb-12 fade-in">
-            <div class="search-bar">
-		 </a><div role="search">
-		 <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
-    		 <input type="text" class="search-input" placeholder="请输入关键词进行检索..." aria-label="搜索" />
-                <button class="search-button">检索</button>
- 		 </form>
-            </div>
+    <!-- 作者跳转按钮 -->
+    <a id="author-btn" href="https://www.yjln.com" target="_blank">By Cannis_GU</a>
 
-            <!-- 知识库模块部分 -->
-            <div class="card rounded-lg p-6 bg-gradient-to-r from-blue-100 to-purple-50 dark:from-blue-800/20 dark:to-purple-800/20 mb-8">
-                <h2 class="text-2xl font-bold mb-4">零一学院知识库模块</h2>
-                <p class="text-lg text-gray-700 dark:text-gray-300 mb-6">零一学院知识库包含多个功能模块，为学生和教师提供全面的知识管理和交流平台。</p>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                    <div class="card sub-card p-4 rounded-lg">
-                        <div class="flex items-center mb-2">
-                            <i class="fas fa-sitemap text-blue-500 mr-2"></i>
-                            <h3 class="font-semibold">零一TALK</h3>
-                        </div>
-                        <p class="text-sm text-gray-600 dark:text-gray-400">零一学院的内部论坛</p>
-                    </div>
-                    <div class="card sub-card p-4 rounded-lg">
-                        <div class="flex items-center mb-2">
-                            <i class="fas fa-project-diagram text-purple-500 mr-2"></i>
-                            <h3 class="font-semibold">知识网状图谱</h3>
-                        </div>
-                        <p class="text-sm text-gray-600 dark:text-gray-400">通过Markdown双向链接与标签系统，建立知识点之间的关联网络</p>
-                    </div>
-                    <div class="card sub-card p-4 rounded-lg">
-                        <div class="flex items-center mb-2">
-                            <i class="fas fa-rocket text-green-500 mr-2"></i>
-                            <h3 class="font-semibold">内容创作</h3>
-                        </div>
-                        <p class="text-sm text-gray-600 dark:text-gray-400">欢迎零一学子踊跃分享灵感和思考</p>
-                    </div>
-                </div>
-            </div>
+    <div id="fps-counter">FPS: -- | 粒子数: --</div>
 
-            <!-- 分隔线 -->
-            <div class="section-divider"></div>
-
-            <!-- 构建方案部分 -->
-            <div class="card rounded-lg p-6 bg-gradient-to-r from-blue-100 to-purple-50 dark:from-blue-800/20 dark:to-purple-800/20 mt-8">
-                <h2 class="text-2xl font-bold mb-4">零一学院知识库网站构建方案</h2>
-                <p class="text-lg text-gray-700 dark:text-gray-300 mb-6">本方案旨在基于GitHub平台，为零一学院构建一个分类清晰、知识点相互关联、界面科技感的知识库网站。通过结合静态站点生成器、现代前端框架和自动化部署工具，打造一个专业、高效的知识管理平台。</p>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                    <div class="card sub-card p-4 rounded-lg">
-                        <div class="flex items-center mb-2">
-                            <i class="fas fa-sitemap text-blue-500 mr-2"></i>
-                            <h3 class="font-semibold">分类清晰</h3>
-                        </div>
-                        <p class="text-sm text-gray-600 dark:text-gray-400">采用分层结构与标签系统，实现知识的有序组织与检索</p>
-                    </div>
-                    <div class="card sub-card p-4 rounded-lg">
-                        <div class="flex items-center mb-2">
-                            <i class="fas fa-project-diagram text-purple-500 mr-2"></i>
-                            <h3 class="font-semibold">网状关联</h3>
-                        </div>
-                        <p class="text-sm text-gray-6 00 dark:text-gray-400">通过Markdown双向链接与标签系统，建立知识点之间的关联网络</p>
-                    </div>
-                    <div class="card sub-card p-4 rounded-lg">
-                        <div class="flex items-center mb-2">
-                            <i class="fas fa-rocket text-green-500 mr-2"></i>
-                            <h3 class="font-semibold">科技感界面</h3>
-                        </div>
-                        <p class="text-sm text-gray-600 dark:text-gray-400">使用Tailwind CSS打造现代、响应式界面，提升用户体验</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-	<div class="card rounded-lg p-6 bg-gradient-to-r from-blue-100 to-purple-50 dark:from-blue-800/20 dark:to-purple-800/20 mb-8">
-    <!-- 主标题升级 -->
-    <h1 class="text-3xl font-extrabold mb-6" id="_1">零一学院共享知识库</h1>
-    
-    <!-- 项目背景作为特殊提示卡 -->
-    <div class="card sub-card p-4 rounded-lg bg-blue-50/50 dark:bg-blue-900/20 mb-6">
-        <h2 class="text-xl font-semibold mb-3" id="_2">🚀 项目背景</h2>
-        <p class="text-gray-700 dark:text-gray-300 leading-relaxed">
-            我们致力于打造开放共享的学习资源平台，通过集体智慧汇集课程资料、学习心得和技术实践，帮助学习者减少重复探索，快速获取优质学习资源。
-        </p>
+    <div id="loading">
+        正在初始化粒子系统...
     </div>
 
-    <!-- 平台特色三列布局 -->
-    <h2 class="text-2xl font-bold mb-4" id="_3">✨ 平台特色</h2>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div class="card sub-card p-4 rounded-lg">
-            <div class="flex items-center mb-2">
-                <i class="fas fa-book-open text-blue-500 mr-2"></i>
-                <h3 class="font-semibold">结构化知识体系</h3>
+    <div id="camera-permission">
+        <h3>摄像头权限请求</h3>
+        <p>为了使用手势控制功能，请允许访问您的摄像头</p>
+        <div id="hand-preview">手部预览区域</div>
+        <button onclick="requestCameraPermission()">允许摄像头访问</button>
+        <p style="font-size: 12px; margin-top: 15px; color: #888;">或者您可以选择跳过，使用自动演示模式</p>
+        <button onclick="skipCameraPermission()" style="background: transparent; border: 1px solid #666; color: #888; margin-top: 10px;">跳过手势控制</button>
+    </div>
+
+    <div id="gesture-guide" class="hidden">
+        <h3>手势控制指南</h3>
+        <p>使用手势与土星互动：</p>
+        <div class="gesture-demo">
+            <div class="gesture-item">
+                <div class="gesture-icon">👆</div>
+                <div>捏合缩放</div>
             </div>
-            <p class="text-sm text-gray-600 dark:text-gray-400">层级清晰的Wiki式文档架构</p>
+            <div class="gesture-item">
+                <div class="gesture-icon">👋</div>
+                <div>手掌移动旋转</div>
+            </div>
         </div>
-        <div class="card sub-card p-4 rounded-lg">
-            <div class="flex items-center mb-2">
-                <i class="fas fa-sync-alt text-purple-500 mr-2"></i>
-                <h3 class="font-semibold">持续更新</h3>
+        <button onclick="hideGestureGuide()">开始探索</button>
+    </div>
+
+    <div id="ui-layer">
+        <div class="glass-panel">
+            <h1>土星</h1>
+            <div class="status-text">
+                数据流状态: <span id="status-indicator" class="highlight">待机</span>
+                <br><br>
+                > 开普勒轨道: 运行中<br>
+                > 粒子总数: <span id="particle-count">60万+</span><br>
+                > 性能模式: <span id="performance-mode">平衡</span>
             </div>
-            <p class="text-sm text-gray-600 dark:text-gray-400">社区驱动的资源进化机制</p>
-        </div>
-        <div class="card sub-card p-4 rounded-lg">
-            <div class="flex items-center mb-2">
-                <i class="fab fa-github text-green-500 mr-2"></i>
-                <h3 class="font-semibold">协作共建</h3>
-            </div>
-            <p class="text-sm text-gray-600 dark:text-gray-400">GitHub驱动的协同编辑流程</p>
         </div>
     </div>
 
-    <!-- 参与贡献双列布局 -->
-    <h2 class="text-2xl font-bold mb-4" id="_4">👥 参与贡献</h2>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        <div class="card sub-card p-4 rounded-lg">
-            <div class="flex items-center mb-2">
-                <i class="fas fa-code-branch text-yellow-500 mr-2"></i>
-                <h3 class="font-semibold">主要贡献方式</h3>
-            </div>
-            <ul class="list-disc pl-5 text-sm text-gray-600 dark:text-gray-400">
-                <li>提交学习笔记和实验报告</li>
-                <li>分享项目实践案例</li>
-                <li>完善文档组织结构</li>
-            </ul>
-        </div>
-        <div class="card sub-card p-4 rounded-lg">
-            <div class="flex items-center mb-2">
-                <i class="fas fa-balance-scale text-pink-500 mr-2"></i>
-                <h3 class="font-semibold" id="_5">许可协议</h3>
-            </div>
-            <p class="text-sm text-gray-600 dark:text-gray-400">
-                采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" 
-                      class="text-blue-600 hover:underline dark:text-blue-400"
-                      target="_blank">CC-BY-NC-SA 4.0</a> 协议
-                <ul class="list-[lower-roman] pl-5 mt-2 text-xs">
-                    <li>署名原作者</li>
-                    <li>非商业性使用</li>
-                    <li>相同方式共享</li>
-                </ul>
-            </p>
+    <div id="info-panel">
+        <div class="notification">
+            <strong>探索提示</strong><br>
+            尝试用手势控制土星的缩放和旋转
         </div>
     </div>
-</div>
 
-        <!-- 分隔线 -->
-        <div class="section-divider"></div>
-    </main>
-    <footer class="bg-gray-100 dark:bg-gray-800 py-8">
-        <div class="container mx-auto px-4">
-            <div class="flex flex-col md:flex-row justify-between items-center">
-                <div class="mb-4 md:mb-0">
-                    <h3 class="text-lg font-semibold mb-2">零一学院知识库网站构建方案</h3>
-                    <p class="text-sm text-gray-600 dark:text-gray-400">基于GitHub的现代知识管理系统| 使用 <a href="https://www.mkdocs.org/">MkDocs</a> 构建</p>
-                </div>
-                <div class="text-center md:text-right">
-                    <p class="text-sm text-gray-600 dark:text-gray-400">作者：Cannis؄GU</p>
-                    <p class="text-xs text-gray-500 dark:text-gray-500 mt-1">© 2025 版权所有</p>
-                </div>
+    <div id="performance-panel">
+        <div class="glass-panel">
+            <h3>性能设置</h3>
+            <div class="performance-option">
+                <input type="radio" id="performance-low" name="performance" value="low">
+                <label for="performance-low">节能模式 (30万粒子)</label>
+            </div>
+            <div class="performance-option">
+                <input type="radio" id="performance-medium" name="performance" value="medium" checked>
+                <label for="performance-medium">平衡模式 (60万粒子)</label>
+            </div>
+            <div class="performance-option">
+                <input type="radio" id="performance-high" name="performance" value="high">
+                <label for="performance-high">极致模式 (90万粒子)</label>
             </div>
         </div>
-    </footer>
-    <script>
-        const themeToggle = document.getElementById('theme-toggle');
-        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-            document.documentElement.classList.add('dark');
+    </div>
+
+    <div id="controls">
+        <button onclick="toggleFullScreen()">全屏体验</button>
+        <button id="toggle-ui" onclick="toggleUI()">隐藏界面</button>
+        <button id="reset-view" onclick="resetView()">重置视角</button>
+        <button id="toggle-hand-tracking" onclick="toggleHandTracking()">开启手势控制</button>
+    </div>
+
+    <div id="canvas-container"></div>
+
+    <!-- 着色器代码保持不变 -->
+    <script type="x-shader/x-vertex" id="vertexshader">
+        attribute float size;
+        attribute vec3 customColor;
+        attribute float opacityAttr;
+        attribute float orbitSpeed;
+        attribute float isRing;
+        attribute float aRandomId;
+        
+        varying vec3 vColor;
+        varying float vDist;
+        varying float vOpacity;
+        varying float vScaleFactor;
+        varying float vIsRing;
+        
+        uniform float uTime;
+        uniform float uScale;
+        uniform float uRotationX;
+        
+        // 2D 旋转矩阵
+        mat2 rotate2d(float _angle){
+            return mat2(cos(_angle),-sin(_angle),
+                        sin(_angle),cos(_angle));
+        }
+
+        // 简单的哈希函数，用来做随机
+        float hash(float n) { return fract(sin(n) * 43758.5453123); }
+
+        void main() {
+            // 根据缩放级别做 LOD (细节层次) 剔除
+            float normScaleLOD = clamp((uScale - 0.15) / 2.35, 0.0, 1.0);
+            float visibilityThreshold = 0.9 + pow(normScaleLOD, 1.2) * 0.1; 
+
+            // 如果随机ID大于阈值，直接把点扔出屏幕，省显卡资源
+            if (aRandomId > visibilityThreshold) {
+                gl_Position = vec4(0.0);
+                gl_PointSize = 0.0;
+                return;
+            }
+
+            vec3 pos = position;
+
+            // 让光环和本体分开旋转，增加动态感
+            if (isRing > 0.5) {
+                float angleOffset = uTime * orbitSpeed * 0.2;
+                vec2 rotatedXZ = rotate2d(angleOffset) * pos.xz;
+                pos.x = rotatedXZ.x;
+                pos.z = rotatedXZ.y;
+            } else {
+                float bodyAngle = uTime * 0.03;
+                vec2 rotatedXZ = rotate2d(bodyAngle) * pos.xz;
+                pos.x = rotatedXZ.x;
+                pos.z = rotatedXZ.y;
+            }
+
+            // 处理整体视角的 X 轴旋转（即手势控制的俯仰角）
+            float cx = cos(uRotationX);
+            float sx = sin(uRotationX);
+            float ry = pos.y * cx - pos.z * sx;
+            float rz = pos.y * sx + pos.z * cx;
+            pos.y = ry;
+            pos.z = rz;
+
+            // 转换到相机空间
+            vec4 mvPosition = modelViewMatrix * vec4(pos * uScale, 1.0);
+            float dist = -mvPosition.z;
+            vDist = dist;
+
+            // --- 混沌噪点效果 ---
+            // 当摄像机贴得很近时，让粒子位置产生抖动，模拟气体湍流
+            float chaosThreshold = 25.0; 
+            if (dist < chaosThreshold && dist > 0.1) {
+                float chaosIntensity = 1.0 - (dist / chaosThreshold);
+                chaosIntensity = pow(chaosIntensity, 3.0);
+
+                float highFreqTime = uTime * 40.0; 
+                float noiseX = sin(highFreqTime + pos.x * 10.0) * hash(pos.y);
+                float noiseY = cos(highFreqTime + pos.y * 10.0) * hash(pos.x);
+                float noiseZ = sin(highFreqTime * 0.5) * hash(pos.z);
+                
+                vec3 noiseVec = vec3(noiseX, noiseY, noiseZ) * chaosIntensity * 3.0;
+                mvPosition.xyz += noiseVec;
+            }
+            
+            gl_Position = projectionMatrix * mvPosition;
+            
+            // 根据距离计算粒子大小 (透视投影)
+            float pointSize = size * (350.0 / dist); 
+            pointSize *= 0.55; 
+
+            // 近距离观察行星本体时，稍微把点变小一点，看起来更细腻
+            if (isRing < 0.5 && dist < 50.0) {
+                 pointSize *= 0.8; 
+            }
+
+            gl_PointSize = clamp(pointSize, 0.0, 300.0);
+
+            // 传递数据给片元着色器
+            vColor = customColor;
+            vOpacity = opacityAttr;
+            vScaleFactor = uScale;
+            vIsRing = isRing;
+        }
+    </script>
+
+    <script type="x-shader/x-fragment" id="fragmentshader">
+        varying vec3 vColor;
+        varying float vDist;
+        varying float vOpacity;
+        varying float vScaleFactor;
+        varying float vIsRing;
+        
+        void main() {
+            // 把方形的点变成圆的
+            vec2 cxy = 2.0 * gl_PointCoord - 1.0;
+            float r = dot(cxy, cxy);
+            if (r > 1.0) discard;
+            
+            // 边缘羽化，做成光球的效果
+            float glow = smoothstep(1.0, 0.4, r); 
+            
+            // 根据缩放比例计算一个过渡值
+            float t = clamp((vScaleFactor - 0.15) / 2.35, 0.0, 1.0);
+
+            // 颜色混合逻辑：放大时偏向原色，缩小时偏向深金色
+            vec3 deepGold = vec3(0.35, 0.22, 0.05); 
+            float colorMix = smoothstep(0.1, 0.9, t);
+            vec3 baseColor = mix(deepGold, vColor, colorMix);
+
+            float brightness = 0.2 + 1.0 * t; 
+
+            // 密度透明度调整
+            float densityAlpha = 0.25 + 0.45 * smoothstep(0.0, 0.5, t);
+
+            vec3 finalColor = baseColor * brightness;
+            
+            // --- 近距离纹理增强 ---
+            if (vDist < 40.0) {
+                float closeMix = 1.0 - (vDist / 40.0);
+                
+                if (vIsRing < 0.5) {
+                    // 行星本体：增加一点对比度和深色纹理
+                    vec3 deepTexture = pow(vColor, vec3(1.4)) * 1.5; 
+                    finalColor = mix(finalColor, deepTexture, closeMix * 0.8);
+                } else {
+                    // 光环：增加一点尘埃感
+                    finalColor += vec3(0.15, 0.12, 0.1) * closeMix;
+                }
+            }
+
+            // 防止近裁切面太生硬，淡出
+            float depthAlpha = 1.0;
+            if (vDist < 10.0) depthAlpha = smoothstep(0.0, 10.0, vDist);
+
+            float alpha = glow * vOpacity * densityAlpha * depthAlpha;
+            
+            gl_FragColor = vec4(finalColor, alpha);
+        }
+    </script>
+
+    <!-- 背景星空着色器保持不变 -->
+    <script type="x-shader/x-vertex" id="starVertexShader">
+        attribute float size;
+        attribute vec3 customColor;
+        varying vec3 vColor;
+        uniform float uTime;
+
+        void main() {
+            vColor = customColor;
+            vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+            float dist = -mvPosition.z;
+            // 星星不需要太大，这里限制一下大小
+            gl_PointSize = size * (1000.0 / dist); 
+            gl_PointSize = clamp(gl_PointSize, 1.0, 8.0);
+            gl_Position = projectionMatrix * mvPosition;
+        }
+    </script>
+
+    <script type="x-shader/x-fragment" id="starFragmentShader">
+        varying vec3 vColor;
+        uniform float uTime;
+        float random(vec2 st) { return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123); }
+        void main() {
+            vec2 cxy = 2.0 * gl_PointCoord - 1.0;
+            float r = dot(cxy, cxy);
+            if (r > 1.0) discard;
+            
+            // 模拟星星闪烁
+            float noise = random(gl_FragCoord.xy);
+            float twinkle = 0.7 + 0.3 * sin(uTime * 2.0 + noise * 10.0);
+            
+            float glow = 1.0 - r;
+            glow = pow(glow, 1.5);
+            
+            gl_FragColor = vec4(vColor * twinkle, glow * 0.8);
+        }
+    </script>
+
+    <!-- 行星着色器保持不变 -->
+    <script type="x-shader/x-vertex" id="planetVertexShader">
+        varying vec2 vUv;
+        varying vec3 vNormal;
+        varying vec3 vViewPosition;
+        void main() {
+            vUv = uv;
+            vNormal = normalize(normalMatrix * normal);
+            vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+            vViewPosition = -mvPosition.xyz;
+            gl_Position = projectionMatrix * mvPosition;
+        }
+    </script>
+
+    <script type="x-shader/x-fragment" id="planetFragmentShader">
+        uniform vec3 color1;
+        uniform vec3 color2;
+        uniform float noiseScale;
+        uniform vec3 lightDir;
+        uniform float atmosphere;
+        
+        varying vec2 vUv;
+        varying vec3 vNormal;
+        varying vec3 vViewPosition;
+
+        // 基础噪声函数
+        float random(vec2 st) { return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123); }
+        float noise(vec2 st) {
+            vec2 i = floor(st);
+            vec2 f = fract(st);
+            float a = random(i);
+            float b = random(i + vec2(1.0, 0.0));
+            float c = random(i + vec2(0.0, 1.0));
+            float d = random(i + vec2(1.0, 1.0));
+            vec2 u = f * f * (3.0 - 2.0 * f);
+            return mix(a, b, u.x) + (c - a)* u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
         }
         
-        themeToggle.addEventListener('click', () => {
-            // 强制重新绘制DOM以确保动画开始
-            document.body.offsetHeight;
+        // 分形布朗运动 (FBM) - 用来生成地形或云层纹理
+        float fbm(vec2 st) {
+            float value = 0.0;
+            float amplitude = 0.5;
+            for (int i = 0; i < 5; i++) {
+                value += amplitude * noise(st);
+                st *= 2.0;
+                amplitude *= 0.5;
+            }
+            return value;
+        }
+
+        void main() {
+            // 根据噪声生成地表颜色
+            float n = fbm(vUv * noiseScale);
+            vec3 albedo = mix(color1, color2, n);
             
-            document.documentElement.classList.toggle('dark');
-        });
+            // 简单的漫反射光照
+            vec3 normal = normalize(vNormal);
+            vec3 light = normalize(lightDir);
+            float diff = max(dot(normal, light), 0.05);
+            
+            // 菲涅尔效应 (Fresnel) - 用来模拟大气层边缘发光
+            vec3 viewDir = normalize(vViewPosition);
+            float fresnel = pow(1.0 - dot(viewDir, normal), 3.0);
+            
+            vec3 finalColor = albedo * diff + atmosphere * vec3(0.5, 0.6, 1.0) * fresnel;
+            
+            gl_FragColor = vec4(finalColor, 1.0);
+        }
+    </script>
+
+    <script>
+        // 全局变量
+        let scene, camera, renderer, particles, stars, nebula;
+        let planetGroup;
+        let uniforms, starUniforms;
         
-        const fadeElements = document.querySelectorAll('.fade-in');
-        const observer = new IntersectionObserver(entries => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.opacity = 1;
-                    entry.target.style.transform = 'translateY(0)';
+        // 目标值 vs 当前值 (用于平滑动画)
+        let targetScale = 1.0;
+        let targetRotX = 0.4;
+        let currentScale = 1.0;
+        let currentRotX = 0.4;
+        
+        // 性能相关变量
+        let particleCount = 600000; // 默认粒子数
+        let performanceMode = 'medium'; // 性能模式
+        let isUIHidden = false;
+        let isHandDetected = false;
+        let lastHandDetectionTime = 0;
+        let handTrackingEnabled = false;
+        
+        // DOM 元素
+        const videoElement = document.getElementsByClassName('input_video')[0];
+        const statusElement = document.getElementById('status-indicator');
+        const loadingElement = document.getElementById('loading');
+        const fpsCounter = document.getElementById('fps-counter');
+        const particleCountElement = document.getElementById('particle-count');
+        const performanceModeElement = document.getElementById('performance-mode');
+        const infoPanel = document.getElementById('info-panel');
+        const gestureGuide = document.getElementById('gesture-guide');
+        const cameraPermissionPanel = document.getElementById('camera-permission');
+        const toggleHandTrackingBtn = document.getElementById('toggle-hand-tracking');
+        
+        // 性能监控
+        let frameCount = 0;
+        let lastTime = performance.now();
+        let fps = 0;
+        
+        // 手势识别相关变量
+        let hands;
+        let cameraUtils;
+
+        // 初始化Three.js场景
+        function initThree() {
+            const container = document.getElementById('canvas-container');
+
+            scene = new THREE.Scene();
+            scene.fog = new THREE.FogExp2(0x020202, 0.00015);
+
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 10000);
+            camera.position.z = 100;
+            camera.lookAt(0, 0, 0);
+
+            // 初始化土星系统
+            initSaturn();
+            
+            // 初始化背景星空
+            initStarfield();
+
+            // 初始化背景实体行星
+            initPlanets();
+
+            renderer = new THREE.WebGLRenderer({ 
+                antialias: true, 
+                alpha: true,
+                powerPreference: "high-performance"
+            });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.setClearColor(0x000000, 0); 
+            container.appendChild(renderer.domElement);
+
+            window.addEventListener('resize', onWindowResize);
+
+            // 性能模式选择事件
+            document.querySelectorAll('input[name="performance"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    setPerformanceMode(this.value);
+                });
+            });
+
+            // 开始渲染循环
+            animate();
+            
+            // 更新状态指示器
+            updateStatusIndicator("自动巡航", "等待中...", "#666");
+            
+            // 初始化手势识别（但不立即启动）
+            initHandTracking();
+        }
+
+        // 初始化手势识别系统
+        function initHandTracking() {
+            hands = new Hands({
+                locateFile: (file) => {
+                    return `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`;
                 }
             });
-        }, { threshold: 0.1 });
+
+            hands.setOptions({
+                maxNumHands: 1,
+                modelComplexity: 1,
+                minDetectionConfidence: 0.7,
+                minTrackingConfidence: 0.6
+            });
+
+            hands.onResults(onResults);
+            
+            // 创建摄像头工具但不立即启动
+            cameraUtils = new Camera(videoElement, {
+                onFrame: async () => {
+                    if (handTrackingEnabled) {
+                        try {
+                            await hands.send({image: videoElement});
+                        } catch (e) {
+                            console.error("手势识别错误:", e);
+                        }
+                    }
+                },
+                width: 640,
+                height: 480
+            });
+        }
+
+        // 手势识别结果处理
+        function onResults(results) {
+            if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+                isHandDetected = true;
+                lastHandDetectionTime = performance.now() / 1000;
+                const hand = results.multiHandLandmarks[0];
+
+                // 用大拇指和食指的距离控制缩放
+                const p1 = hand[4];
+                const p2 = hand[8];
+                const dist = Math.sqrt((p1.x-p2.x)**2 + (p1.y-p2.y)**2);
+                
+                // 归一化距离并映射到缩放系数
+                const normDist = Math.max(0, Math.min(1, (dist - 0.02) / 0.25));
+                targetScale = 0.15 + normDist * 2.35; 
+
+                // 用手掌在屏幕的 Y 轴位置控制俯仰角
+                const y = hand[9].y;
+                const normY = Math.max(0, Math.min(1, (y - 0.1) / 0.8));
+                targetRotX = -0.6 + normY * 1.6;
+
+                // 更新状态指示器
+                updateStatusIndicator("手动控制", "已连接", "#c5a059");
+                
+                // 隐藏手势引导
+                hideGestureGuide();
+            } else {
+                isHandDetected = false;
+                // 如果超过5秒没有检测到手，显示提示
+                if (performance.now() / 1000 - lastHandDetectionTime > 5) {
+                    updateStatusIndicator("手动控制", "等待手势...", "#c5a059");
+                    showGestureGuide();
+                }
+            }
+        }
+
+        // 请求摄像头权限
+        function requestCameraPermission() {
+            cameraUtils.start().then(() => {
+                // 摄像头启动成功
+                cameraPermissionPanel.classList.add('hidden');
+                handTrackingEnabled = true;
+                toggleHandTrackingBtn.textContent = '关闭手势控制';
+                toggleHandTrackingBtn.classList.add('active');
+                updateStatusIndicator("手动控制", "等待手势...", "#c5a059");
+                showGestureGuide();
+            }).catch(e => {
+                console.error("摄像头启动失败:", e);
+                alert("无法访问摄像头，请检查权限设置或使用自动演示模式");
+                skipCameraPermission();
+            });
+        }
+
+        // 跳过摄像头权限
+        function skipCameraPermission() {
+            cameraPermissionPanel.classList.add('hidden');
+            handTrackingEnabled = false;
+            toggleHandTrackingBtn.textContent = '开启手势控制';
+            toggleHandTrackingBtn.classList.remove('active');
+            updateStatusIndicator("自动巡航", "等待中...", "#666");
+        }
+
+        // 切换手势控制
+        function toggleHandTracking() {
+            if (handTrackingEnabled) {
+                // 关闭手势控制
+                handTrackingEnabled = false;
+                toggleHandTrackingBtn.textContent = '开启手势控制';
+                toggleHandTrackingBtn.classList.remove('active');
+                updateStatusIndicator("自动巡航", "等待中...", "#666");
+                hideGestureGuide();
+            } else {
+                // 开启手势控制
+                cameraPermissionPanel.classList.remove('hidden');
+            }
+        }
+
+        // 初始化土星系统
+        function initSaturn() {
+            // 根据性能模式设置粒子数量
+            switch(performanceMode) {
+                case 'low': particleCount = 300000; break;
+                case 'medium': particleCount = 600000; break;
+                case 'high': particleCount = 900000; break;
+            }
+            
+            particleCountElement.textContent = `${Math.round(particleCount/10000)/10}万+`;
+            performanceModeElement.textContent = 
+                performanceMode === 'low' ? '节能' : 
+                performanceMode === 'medium' ? '平衡' : '极致';
+
+            const geometry = new THREE.BufferGeometry();
+            
+            // 申请内存
+            const positions = new Float32Array(particleCount * 3);
+            const colors = new Float32Array(particleCount * 3);
+            const sizes = new Float32Array(particleCount);
+            const opacities = new Float32Array(particleCount);
+            const orbitSpeeds = new Float32Array(particleCount);
+            const isRings = new Float32Array(particleCount);
+            const randomIds = new Float32Array(particleCount);
+
+            // 土星本体的色调
+            const bodyColors = [
+                new THREE.Color('#E3DAC5'), 
+                new THREE.Color('#C9A070'), 
+                new THREE.Color('#E3DAC5'), 
+                new THREE.Color('#B08D55')  
+            ];
+            
+            // 土星环的各层颜色
+            const colorRingC = new THREE.Color('#2A2520'); 
+            const colorRingB_Inner = new THREE.Color('#CDBFA0'); 
+            const colorRingB_Outer = new THREE.Color('#DCCBBA'); 
+            const colorCassini = new THREE.Color('#050505');
+            const colorRingA = new THREE.Color('#989085'); 
+            const colorRingF = new THREE.Color('#AFAFA0'); 
+
+            const R_PLANET = 18; // 行星基础半径
+
+            for(let i = 0; i < particleCount; i++) {
+                let x, y, z, r, g, b, size, opacity, speed, isRingVal;
+                randomIds[i] = Math.random();
+
+                // 前 25% 的粒子用来画土星本体
+                if (i < particleCount * 0.25) {
+                    isRingVal = 0.0;
+                    speed = 0.0;
+                    const u = Math.random();
+                    const v = Math.random();
+                    const theta = 2 * Math.PI * u;
+                    const phi = Math.acos(2 * v - 1);
+                    const rad = R_PLANET;
+                    
+                    x = rad * Math.sin(phi) * Math.cos(theta);
+                    let rawY = rad * Math.cos(phi);
+                    z = rad * Math.sin(phi) * Math.sin(theta);
+                    
+                    // 土星是扁的，压扁一点 Y 轴
+                    y = rawY * 0.9;
+                    
+                    // 生成条纹图案
+                    let lat = (rawY / rad + 1.0) * 0.5; 
+                    let bandNoise = Math.cos(lat * 40.0) * 0.8 + Math.cos(lat * 15.0) * 0.4;
+                    let colIndex = Math.floor(lat * 4 + bandNoise) % 4;
+                    if (colIndex < 0) colIndex = 0;
+                    let baseCol = bodyColors[colIndex];
+                    
+                    r = baseCol.r; g = baseCol.g; b = baseCol.b;
+                    size = 1.0 + Math.random() * 0.8; 
+                    opacity = 0.8; 
+                } else {
+                    // 剩下的粒子画光环
+                    isRingVal = 1.0;
+                    let zoneRand = Math.random();
+                    let ringRadius;
+                    let ringCol;
+                    
+                    // 根据概率分布生成不同的环带
+                    if (zoneRand < 0.15) { 
+                        // C环
+                        ringRadius = R_PLANET * (1.235 + Math.random() * (1.525 - 1.235));
+                        ringCol = colorRingC;
+                        size = 0.5; opacity = 0.3; 
+                    } else if (zoneRand < 0.65) { 
+                        // B环
+                        let t = Math.random();
+                        ringRadius = R_PLANET * (1.525 + t * (1.95 - 1.525));
+                        ringCol = colorRingB_Inner.clone().lerp(colorRingB_Outer, t);
+                        size = 0.8 + Math.random() * 0.6; opacity = 0.85; 
+                        if (Math.sin(ringRadius * 2.0) > 0.8) opacity *= 1.2;
+                    } else if (zoneRand < 0.69) { 
+                        // 卡西尼缝
+                        ringRadius = R_PLANET * (1.95 + Math.random() * (2.025 - 1.95));
+                        ringCol = colorCassini;
+                        size = 0.3; opacity = 0.1; 
+                    } else if (zoneRand < 0.99) { 
+                        // A环
+                        ringRadius = R_PLANET * (2.025 + Math.random() * (2.27 - 2.025));
+                        ringCol = colorRingA;
+                        size = 0.7; opacity = 0.6;
+                        if (ringRadius > R_PLANET * 2.2 && ringRadius < R_PLANET * 2.21) opacity = 0.1;
+                    } else { 
+                        // F环
+                        ringRadius = R_PLANET * (2.32 + Math.random() * 0.02);
+                        ringCol = colorRingF;
+                        size = 1.0; opacity = 0.7;
+                    }
+                    
+                    const theta = Math.random() * Math.PI * 2;
+                    x = ringRadius * Math.cos(theta);
+                    z = ringRadius * Math.sin(theta);
+                    
+                    // 环也是有厚度的，稍微随机一点 Y
+                    let thickness = 0.15;
+                    if (ringRadius > R_PLANET * 2.3) thickness = 0.4; 
+                    y = (Math.random() - 0.5) * thickness;
+                    
+                    r = ringCol.r; g = ringCol.g; b = ringCol.b;
+                    
+                    // 开普勒第三定律：越外层转得越慢
+                    speed = 8.0 / Math.sqrt(ringRadius);
+                }
+                
+                positions[i*3] = x; positions[i*3+1] = y; positions[i*3+2] = z;
+                colors[i*3] = r; colors[i*3+1] = g; colors[i*3+2] = b;
+                sizes[i] = size; opacities[i] = opacity;
+                orbitSpeeds[i] = speed; isRings[i] = isRingVal;
+            }
+
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geometry.setAttribute('customColor', new THREE.BufferAttribute(colors, 3));
+            geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+            geometry.setAttribute('opacityAttr', new THREE.BufferAttribute(opacities, 1));
+            geometry.setAttribute('orbitSpeed', new THREE.BufferAttribute(orbitSpeeds, 1));
+            geometry.setAttribute('isRing', new THREE.BufferAttribute(isRings, 1));
+            geometry.setAttribute('aRandomId', new THREE.BufferAttribute(randomIds, 1));
+
+            uniforms = {
+                uTime: { value: 0 },
+                uScale: { value: 1.0 },
+                uRotationX: { value: 0.4 }
+            };
+
+            const material = new THREE.ShaderMaterial({
+                depthWrite: false,
+                blending: THREE.AdditiveBlending,
+                vertexColors: true,
+                uniforms: uniforms,
+                vertexShader: document.getElementById('vertexshader').textContent,
+                fragmentShader: document.getElementById('fragmentshader').textContent,
+                transparent: true
+            });
+
+            particles = new THREE.Points(geometry, material);
+            particles.rotation.z = 26.73 * (Math.PI / 180); // 土星真实的轴倾角
+            scene.add(particles);
+        }
+
+        // 初始化背景星空
+        function initStarfield() {
+            const starCount = performanceMode === 'low' ? 20000 : 
+                             performanceMode === 'medium' ? 50000 : 80000;
+            
+            const geo = new THREE.BufferGeometry();
+            const pos = new Float32Array(starCount * 3);
+            const cols = new Float32Array(starCount * 3);
+            const sizes = new Float32Array(starCount);
+            
+            // 星星颜色类型
+            const starColors = [
+                new THREE.Color('#9bb0ff'), new THREE.Color('#ffffff'), 
+                new THREE.Color('#ffcc6f'), new THREE.Color('#ff7b7b')
+            ];
+
+            for(let i=0; i<starCount; i++) {
+                const r = 400 + Math.random() * 3000;
+                const theta = Math.random() * Math.PI * 2;
+                const phi = Math.acos(2 * Math.random() - 1);
+                
+                pos[i*3] = r * Math.sin(phi) * Math.cos(theta);
+                pos[i*3+1] = r * Math.cos(phi);
+                pos[i*3+2] = r * Math.sin(phi) * Math.sin(theta);
+                
+                const colorType = Math.random();
+                let c;
+                if(colorType > 0.9) c = starColors[0]; else if(colorType > 0.6) c = starColors[1];
+                else if(colorType > 0.3) c = starColors[2]; else c = starColors[3];
+                
+                cols[i*3] = c.r; cols[i*3+1] = c.g; cols[i*3+2] = c.b;
+                sizes[i] = 1.0 + Math.random() * 3.0;
+            }
+            geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+            geo.setAttribute('customColor', new THREE.BufferAttribute(cols, 3));
+            geo.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+
+            starUniforms = { uTime: { value: 0 } };
+            const mat = new THREE.ShaderMaterial({
+                uniforms: starUniforms,
+                vertexShader: document.getElementById('starVertexShader').textContent,
+                fragmentShader: document.getElementById('starFragmentShader').textContent,
+                transparent: true, depthWrite: false, blending: THREE.AdditiveBlending
+            });
+            stars = new THREE.Points(geo, mat);
+            scene.add(stars);
+
+            // 星云效果
+            const nebulaCount = performanceMode === 'low' ? 50 : 100;
+            const nebGeo = new THREE.BufferGeometry();
+            const nebPos = new Float32Array(nebulaCount * 3);
+            const nebCols = new Float32Array(nebulaCount * 3);
+            const nebSizes = new Float32Array(nebulaCount);
+            for(let i=0; i<nebulaCount; i++) {
+                const r = 800 + Math.random() * 2000;
+                const theta = Math.random() * Math.PI * 2;
+                const phi = Math.PI / 2 + (Math.random() - 0.5) * 1.5;
+                nebPos[i*3] = r * Math.sin(phi) * Math.cos(theta);
+                nebPos[i*3+1] = r * Math.cos(phi);
+                nebPos[i*3+2] = r * Math.sin(phi) * Math.sin(theta);
+                const nc = new THREE.Color().setHSL(0.6 + Math.random()*0.2, 0.8, 0.05);
+                nebCols[i*3] = nc.r; nebCols[i*3+1] = nc.g; nebCols[i*3+2] = nc.b;
+                nebSizes[i] = 400.0 + Math.random() * 600.0;
+            }
+            nebGeo.setAttribute('position', new THREE.BufferAttribute(nebPos, 3));
+            nebGeo.setAttribute('customColor', new THREE.BufferAttribute(nebCols, 3));
+            nebGeo.setAttribute('size', new THREE.BufferAttribute(nebSizes, 1));
+            const nebShaderMat = new THREE.ShaderMaterial({
+                uniforms: {},
+                vertexShader: document.getElementById('starVertexShader').textContent,
+                fragmentShader: `
+                    varying vec3 vColor;
+                    void main() {
+                        vec2 cxy = 2.0 * gl_PointCoord - 1.0;
+                        float r = dot(cxy, cxy);
+                        if(r > 1.0) discard;
+                        float glow = pow(1.0 - r, 2.0);
+                        gl_FragColor = vec4(vColor, glow * 0.1); 
+                    }
+                `,
+                transparent: true, depthWrite: false, blending: THREE.AdditiveBlending
+            });
+            nebula = new THREE.Points(nebGeo, nebShaderMat);
+            scene.add(nebula);
+        }
+
+        // 初始化背景实体行星
+        function initPlanets() {
+            planetGroup = new THREE.Group();
+            scene.add(planetGroup);
+
+            const vShader = document.getElementById('planetVertexShader').textContent;
+            const fShader = document.getElementById('planetFragmentShader').textContent;
+
+            // 1. 火星 (Mars) - 红色，噪点多
+            createPlanet(planetGroup, vShader, fShader, 
+                new THREE.Color('#b33a00'), new THREE.Color('#d16830'), 8.0, 
+                { x: -300, y: 120, z: -450 }, 10, 0.3 
+            );
+
+            // 2. 地球 (Earth) - 蓝白相间
+            createPlanet(planetGroup, vShader, fShader, 
+                new THREE.Color('#001e4d'), new THREE.Color('#ffffff'), 5.0, 
+                { x: 380, y: -100, z: -600 }, 14, 0.6 
+            );
+
+            // 3. 水星 (Mercury) - 灰白，小
+            createPlanet(planetGroup, vShader, fShader, 
+                new THREE.Color('#666666'), new THREE.Color('#aaaaaa'), 15.0, 
+                { x: -180, y: -220, z: -350 }, 6, 0.1 
+            );
+        }
+
+        // 创建行星函数
+        function createPlanet(group, vShader, fShader, c1, c2, nScale, pos, radius, atmo) {
+            const geo = new THREE.SphereGeometry(radius, 48, 48);
+            const mat = new THREE.ShaderMaterial({
+                uniforms: {
+                    color1: { value: c1 },
+                    color2: { value: c2 },
+                    noiseScale: { value: nScale },
+                    lightDir: { value: new THREE.Vector3(1, 0.5, 1) },
+                    atmosphere: { value: atmo }
+                },
+                vertexShader: vShader,
+                fragmentShader: fShader
+            });
+            const mesh = new THREE.Mesh(geo, mat);
+            mesh.position.set(pos.x, pos.y, pos.z);
+            group.add(mesh);
+        }
+
+        const clock = new THREE.Clock();
+        let autoIdleTime = 0;
+
+        // 动画循环
+        function animate() {
+            requestAnimationFrame(animate);
+
+            const elapsedTime = clock.getElapsedTime();
+            uniforms.uTime.value = elapsedTime;
+            if(starUniforms) starUniforms.uTime.value = elapsedTime;
+
+            // 缓慢旋转背景星空
+            if(stars) stars.rotation.y = elapsedTime * 0.005;
+            if(nebula) nebula.rotation.y = elapsedTime * 0.003;
+            
+            // 行星自转
+            if(planetGroup) {
+                planetGroup.children.forEach((planet, idx) => {
+                    planet.rotation.y = elapsedTime * (0.05 + idx * 0.02);
+                });
+                planetGroup.rotation.y = Math.sin(elapsedTime * 0.05) * 0.02;
+            }
+
+            // 自动巡航模式
+            if (!handTrackingEnabled || !isHandDetected) {
+                autoIdleTime += 0.005;
+                targetScale = 1.0 + Math.sin(autoIdleTime) * 0.2;
+                targetRotX = 0.4 + Math.sin(autoIdleTime * 0.3) * 0.15;
+                
+                if (!handTrackingEnabled) {
+                    updateStatusIndicator("自动巡航", "等待中...", "#666");
+                }
+                
+                // 显示提示信息
+                if (elapsedTime - lastHandDetectionTime > 5 && handTrackingEnabled) {
+                    showInfoPanel();
+                }
+            }
+
+            // 平滑插值
+            const lerpFactor = 0.08;
+            currentScale += (targetScale - currentScale) * lerpFactor;
+            currentRotX += (targetRotX - currentRotX) * lerpFactor;
+
+            uniforms.uScale.value = currentScale;
+            uniforms.uRotationX.value = currentRotX;
+
+            renderer.render(scene, camera);
+            
+            // 更新FPS计数器
+            updateFPS();
+            
+            // 隐藏加载界面
+            if (elapsedTime > 1) {
+                loadingElement.style.opacity = '0';
+                if (elapsedTime > 1.5) {
+                    loadingElement.style.display = 'none';
+                }
+            }
+        }
+
+        // 辅助函数
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else if (document.exitFullscreen) {
+                document.exitFullscreen();
+            }
+        }
         
-        fadeElements.forEach(element => {
-            element.style.opacity = 0;
-            element.style.transform = 'translateY(20px)';
-            element.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-            observer.observe(element);
-        });
+        function toggleUI() {
+            isUIHidden = !isUIHidden;
+            const uiLayer = document.getElementById('ui-layer');
+            const performancePanel = document.getElementById('performance-panel');
+            const toggleBtn = document.getElementById('toggle-ui');
+            
+            if (isUIHidden) {
+                uiLayer.style.opacity = '0';
+                performancePanel.style.opacity = '0';
+                toggleBtn.textContent = '显示界面';
+                toggleBtn.classList.add('active');
+            } else {
+                uiLayer.style.opacity = '1';
+                performancePanel.style.opacity = '1';
+                toggleBtn.textContent = '隐藏界面';
+                toggleBtn.classList.remove('active');
+            }
+        }
+        
+        function resetView() {
+            targetScale = 1.0;
+            targetRotX = 0.4;
+            
+            // 添加按钮反馈
+            const btn = document.getElementById('reset-view');
+            btn.classList.add('active');
+            setTimeout(() => {
+                btn.classList.remove('active');
+            }, 300);
+        }
+        
+        function setPerformanceMode(mode) {
+            performanceMode = mode;
+            
+            // 重新初始化场景
+            if (scene) {
+                // 移除现有对象
+                if (particles) scene.remove(particles);
+                if (stars) scene.remove(stars);
+                if (nebula) scene.remove(nebula);
+                
+                // 重新初始化
+                initSaturn();
+                initStarfield();
+            }
+        }
+        
+        function hideGestureGuide() {
+            gestureGuide.classList.add('hidden');
+        }
+        
+        function showGestureGuide() {
+            gestureGuide.classList.remove('hidden');
+        }
+        
+        function showInfoPanel() {
+            infoPanel.classList.add('visible');
+            setTimeout(() => {
+                infoPanel.classList.remove('visible');
+            }, 3000);
+        }
+        
+        function updateFPS() {
+            frameCount++;
+            const currentTime = performance.now();
+            if (currentTime >= lastTime + 1000) {
+                fps = Math.round((frameCount * 1000) / (currentTime - lastTime));
+                frameCount = 0;
+                lastTime = currentTime;
+                
+                fpsCounter.textContent = `FPS: ${fps} | 粒子数: ${Math.round(particleCount/10000)/10}万`;
+            }
+        }
+        
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+        
+        function updateStatusIndicator(status, signal, color) {
+            statusElement.innerHTML = `系统状态: ${status}<br>输入信号: <span class="highlight">${signal}</span>`;
+            statusElement.style.color = color;
+        }
+
+        // 初始化
+        window.addEventListener('load', initThree);
     </script>
 </body>
 </html>
