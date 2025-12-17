@@ -4,13 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>3D粒子打火花系统 - 修复版</title>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/postprocessing/EffectComposer.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/postprocessing/RenderPass.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/postprocessing/UnrealBloomPass.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/shaders/CopyShader.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/postprocessing/ShaderPass.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/handpose@0.0.7/dist/handpose.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-core@2.7.0/dist/tf-core.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-converter@2.7.0/dist/tf-converter.js"></script>
@@ -107,26 +102,25 @@
 
     <script>
         // 全局变量
-        let scene, camera, renderer, composer;
+        let scene, camera, renderer;
         let particles = [];
         let handposeModel = null;
         let video = null;
         let handScale = 1.0;
         let lastHandScale = 1.0;
         let isFullscreen = false;
-        let bloomPass;
         let isInitialized = false;
+        let bloomScene, bloomCamera, bloomComposer;
+        let renderTarget, renderTargetBright, renderTargetHorizontal, renderTargetVertical;
         
         // 参数配置
         const params = {
-            particleCount: 2000,
+            particleCount: 1500,
             baseSize: 0.05,
             baseBrightness: 1.0,
             maxSpeed: 0.5,
             maxOrbitRadius: 6,
-            bloomStrength: 1.5,
-            bloomRadius: 0.4,
-            bloomThreshold: 0.85
+            bloomStrength: 1.5
         };
         
         // 粒子系统
@@ -152,8 +146,6 @@
                 
                 this.chaosFactor = 0;
                 this.noiseOffset = 0;
-                
-                const center = new THREE.Vector3(0, 0, 0);
                 
                 for (let i = 0; i < params.particleCount; i++) {
                     // 轨道参数
@@ -358,6 +350,15 @@
                 
                 document.getElementById('canvas-container').appendChild(renderer.domElement);
                 
+                // 添加光源
+                const ambientLight = new THREE.AmbientLight(0x222222);
+                scene.add(ambientLight);
+                
+                const directionalLight = new THREE.DirectionalLight(0xffd700, 1);
+                directionalLight.position.set(5, 10, 7);
+                directionalLight.castShadow = true;
+                scene.add(directionalLight);
+                
                 // 初始化粒子
                 updateLoadingStatus('创建粒子系统...');
                 initParticles();
@@ -365,30 +366,6 @@
                 // 添加表演者
                 updateLoadingStatus('添加表演者模型...');
                 addPerformer();
-                
-                // 添加辉光效果
-                updateLoadingStatus('设置后期处理效果...');
-                
-                // 确保Three.js的后期处理组件已加载
-                if (typeof THREE.UnrealBloomPass === 'undefined') {
-                    throw new Error('Three.js后期处理组件未正确加载');
-                }
-                
-                // 创建渲染场景
-                const renderScene = new THREE.RenderPass(scene, camera);
-                
-                // 创建辉光效果
-                bloomPass = new THREE.UnrealBloomPass(
-                    new THREE.Vector2(window.innerWidth, window.innerHeight),
-                    params.bloomStrength,
-                    params.bloomRadius,
-                    params.bloomThreshold
-                );
-                
-                // 创建效果合成器
-                composer = new THREE.EffectComposer(renderer);
-                composer.addPass(renderScene);
-                composer.addPass(bloomPass);
                 
                 // 窗口大小调整
                 window.addEventListener('resize', onWindowResize);
@@ -403,53 +380,72 @@
         
         // 初始化粒子
         function initParticles() {
-            // 清空现有粒子
-            particles.forEach(p => scene.remove(p));
-            particles = [];
-            
-            // 初始化粒子系统
-            particleSystem.init();
-            
-            // 创建几何体
-            const geometry = new THREE.BufferGeometry();
-            const positions = new Float32Array(params.particleCount * 3);
-            const colors = new Float32Array(params.particleCount * 3);
-            const sizes = new Float32Array(params.particleCount);
-            
-            // 设置初始属性
-            for (let i = 0; i < params.particleCount; i++) {
-                const pos = particleSystem.positions[i];
-                const color = particleSystem.colors[i];
+            try {
+                // 清空现有粒子
+                if (particles.length > 0) {
+                    particles.forEach(p => {
+                        if (p && scene) {
+                            scene.remove(p);
+                        }
+                    });
+                }
+                particles = [];
                 
-                positions[i * 3] = pos.x;
-                positions[i * 3 + 1] = pos.y;
-                positions[i * 3 + 2] = pos.z;
+                // 初始化粒子系统
+                particleSystem.init();
                 
-                colors[i * 3] = color.r;
-                colors[i * 3 + 1] = color.g;
-                colors[i * 3 + 2] = color.b;
+                // 创建几何体
+                const geometry = new THREE.BufferGeometry();
+                const positions = new Float32Array(params.particleCount * 3);
+                const colors = new Float32Array(params.particleCount * 3);
+                const sizes = new Float32Array(params.particleCount);
                 
-                sizes[i] = particleSystem.sizes[i];
+                // 设置初始属性
+                for (let i = 0; i < params.particleCount; i++) {
+                    const pos = particleSystem.positions[i];
+                    const color = particleSystem.colors[i];
+                    
+                    // 确保位置和颜色已正确初始化
+                    if (!pos || !color) {
+                        throw new Error(`粒子${i}的位置或颜色未正确初始化`);
+                    }
+                    
+                    positions[i * 3] = pos.x;
+                    positions[i * 3 + 1] = pos.y;
+                    positions[i * 3 + 2] = pos.z;
+                    
+                    colors[i * 3] = color.r;
+                    colors[i * 3 + 1] = color.g;
+                    colors[i * 3 + 2] = color.b;
+                    
+                    sizes[i] = particleSystem.sizes[i];
+                }
+                
+                geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+                geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+                geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+                
+                // 材质
+                const material = new THREE.PointsMaterial({
+                    size: params.baseSize,
+                    vertexColors: true,
+                    transparent: true,
+                    opacity: 0.9,
+                    blending: THREE.AdditiveBlending,
+                    sizeAttenuation: true
+                });
+                
+                // 粒子系统
+                const particleSystemObj = new THREE.Points(geometry, material);
+                scene.add(particleSystemObj);
+                particles.push(particleSystemObj);
+                
+                return true;
+            } catch (error) {
+                console.error('粒子初始化失败:', error);
+                showError(`粒子初始化失败: ${error.message}`);
+                return false;
             }
-            
-            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-            geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
-            
-            // 材质
-            const material = new THREE.PointsMaterial({
-                size: params.baseSize,
-                vertexColors: true,
-                transparent: true,
-                opacity: 0.9,
-                blending: THREE.AdditiveBlending,
-                sizeAttenuation: true
-            });
-            
-            // 粒子系统
-            const particleSystemObj = new THREE.Points(geometry, material);
-            scene.add(particleSystemObj);
-            particles.push(particleSystemObj);
         }
         
         // 添加表演者
@@ -626,12 +622,17 @@
                 const sizes = geometry.attributes.size.array;
                 
                 for (let i = 0; i < params.particleCount; i++) {
-                    const pos = particleSystem.positions[i].clone().multiplyScalar(scaleFactor);
+                    const pos = particleSystem.positions[i];
                     const color = particleSystem.colors[i];
                     
-                    positions[i * 3] = pos.x;
-                    positions[i * 3 + 1] = pos.y;
-                    positions[i * 3 + 2] = pos.z;
+                    // 确保位置和颜色已正确初始化
+                    if (!pos || !color) continue;
+                    
+                    const scaledPos = pos.clone().multiplyScalar(scaleFactor);
+                    
+                    positions[i * 3] = scaledPos.x;
+                    positions[i * 3 + 1] = scaledPos.y;
+                    positions[i * 3 + 2] = scaledPos.z;
                     
                     colors[i * 3] = color.r;
                     colors[i * 3 + 1] = color.g;
@@ -645,10 +646,9 @@
                 geometry.attributes.size.needsUpdate = true;
                 
                 particleSystemObj.material.size = params.baseSize * scaleFactor;
-                bloomPass.strength = params.bloomStrength * (0.5 + smoothHandScale * 1.5);
             }
             
-            composer.render();
+            renderer.render(scene, camera);
         }
         
         // 窗口大小调整
@@ -656,7 +656,6 @@
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
-            composer.setSize(window.innerWidth, window.innerHeight);
         }
         
         // 全屏切换
