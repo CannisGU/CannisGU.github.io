@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D粒子打火花系统 - 优化版</title>
+    <title>3D粒子打火花系统 - 修复版</title>
     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/postprocessing/EffectComposer.js"></script>
@@ -69,10 +69,26 @@
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .hidden { display: none !important; }
+        #error-message {
+            color: #ff4500;
+            margin-top: 20px;
+            text-align: center;
+            max-width: 80%;
+        }
+        #retry-btn {
+            margin-top: 20px;
+            background: rgba(255, 69, 0, 0.7);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 16px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
     <div id="canvas-container"></div>
+    
     <div id="ui">
         <div id="title" class="ui-element">3D粒子打火花系统</div>
         <div id="controls" class="ui-element">
@@ -80,9 +96,13 @@
             <button id="reset-btn">重置粒子</button>
         </div>
     </div>
+    
     <div id="loading">
         <div class="spinner"></div>
-        <div>正在初始化...</div>
+        <div>正在初始化系统...</div>
+        <div id="loading-progress"></div>
+        <div id="error-message" class="hidden"></div>
+        <button id="retry-btn" class="hidden">重试</button>
     </div>
 
     <script>
@@ -95,18 +115,18 @@
         let lastHandScale = 1.0;
         let isFullscreen = false;
         let bloomPass;
+        let isInitialized = false;
         
-        // 优化后的参数
+        // 参数配置
         const params = {
-            particleCount: 3000,
-            baseSize: 0.04,
+            particleCount: 2000,
+            baseSize: 0.05,
             baseBrightness: 1.0,
-            maxSpeed: 0.6,
-            maxOrbitRadius: 8,
-            bloomStrength: 3.0,
-            bloomRadius: 1.0,
-            bloomThreshold: 0.3,
-            colorRange: { h: [0.03, 0.15], s: [0.7, 1.0], v: [0.8, 1.0] }
+            maxSpeed: 0.5,
+            maxOrbitRadius: 6,
+            bloomStrength: 1.5,
+            bloomRadius: 0.4,
+            bloomThreshold: 0.85
         };
         
         // 粒子系统
@@ -177,10 +197,10 @@
                     this.sizes[i] = params.baseSize * (0.5 + Math.random() * 1.5);
                     this.brightness[i] = 0.5 + Math.random() * 0.5;
                     
-                    // 颜色（优化后的色域）
-                    const h = params.colorRange.h[0] + Math.random() * (params.colorRange.h[1] - params.colorRange.h[0]);
-                    const s = params.colorRange.s[0] + Math.random() * (params.colorRange.s[1] - params.colorRange.s[0]);
-                    const v = params.colorRange.v[0] + Math.random() * (params.colorRange.v[1] - params.colorRange.v[0]);
+                    // 颜色（从橙色到红色到黄色）
+                    const h = 0.05 + Math.random() * 0.1;
+                    const s = 0.8 + Math.random() * 0.2;
+                    const v = 0.8 + Math.random() * 0.2;
                     
                     const color = new THREE.Color();
                     color.setHSL(h, s, v);
@@ -272,52 +292,113 @@
             }
         };
         
+        // 更新加载状态
+        function updateLoadingStatus(message) {
+            const progressElement = document.getElementById('loading-progress');
+            if (progressElement) {
+                progressElement.textContent = message;
+            }
+        }
+        
+        // 显示错误信息
+        function showError(message) {
+            const errorElement = document.getElementById('error-message');
+            const retryButton = document.getElementById('retry-btn');
+            
+            if (errorElement && retryButton) {
+                errorElement.textContent = message;
+                errorElement.classList.remove('hidden');
+                retryButton.classList.remove('hidden');
+                
+                // 隐藏加载动画
+                const spinner = document.querySelector('.spinner');
+                if (spinner) spinner.style.display = 'none';
+            }
+        }
+        
+        // 隐藏加载界面
+        function hideLoading() {
+            const loadingElement = document.getElementById('loading');
+            if (loadingElement) {
+                loadingElement.classList.add('hidden');
+            }
+        }
+        
         // 初始化Three.js
-        function initThreeJS() {
-            // 场景
-            scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x000000);
-            
-            // 相机
-            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.set(0, 2, 10);
-            camera.lookAt(0, 0, 0);
-            
-            // 渲染器
-            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(window.devicePixelRatio);
-            renderer.shadowMap.enabled = true;
-            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-            
-            document.getElementById('canvas-container').appendChild(renderer.domElement);
-            
-            // 辉光效果
-            const renderScene = new THREE.RenderPass(scene, camera);
-            bloomPass = new THREE.UnrealBloomPass(
-                new THREE.Vector2(window.innerWidth, window.innerHeight),
-                params.bloomStrength,
-                params.bloomRadius,
-                params.bloomThreshold
-            );
-            
-            composer = new THREE.EffectComposer(renderer);
-            composer.addPass(renderScene);
-            composer.addPass(bloomPass);
-            
-            // 初始化粒子系统
-            initParticles();
-            
-            // 添加表演者
-            addPerformer();
-            
-            // 窗口大小调整
-            window.addEventListener('resize', onWindowResize);
-            
-            // 隐藏加载界面
-            setTimeout(() => {
-                document.getElementById('loading').classList.add('hidden');
-            }, 1000);
+        async function initThreeJS() {
+            try {
+                updateLoadingStatus('初始化Three.js场景...');
+                
+                // 创建场景
+                scene = new THREE.Scene();
+                scene.background = new THREE.Color(0x000000);
+                
+                // 创建相机
+                camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+                camera.position.set(0, 2, 10);
+                camera.lookAt(0, 0, 0);
+                
+                // 创建渲染器
+                updateLoadingStatus('创建WebGL渲染器...');
+                renderer = new THREE.WebGLRenderer({ 
+                    antialias: true, 
+                    alpha: true,
+                    powerPreference: "high-performance"
+                });
+                
+                // 检查WebGL支持
+                if (!renderer.getContext()) {
+                    throw new Error('您的浏览器不支持WebGL或WebGL已被禁用');
+                }
+                
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                renderer.setPixelRatio(Math.min(2, window.devicePixelRatio));
+                renderer.shadowMap.enabled = true;
+                renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+                
+                document.getElementById('canvas-container').appendChild(renderer.domElement);
+                
+                // 初始化粒子
+                updateLoadingStatus('创建粒子系统...');
+                initParticles();
+                
+                // 添加表演者
+                updateLoadingStatus('添加表演者模型...');
+                addPerformer();
+                
+                // 添加辉光效果
+                updateLoadingStatus('设置后期处理效果...');
+                
+                // 确保Three.js的后期处理组件已加载
+                if (typeof THREE.UnrealBloomPass === 'undefined') {
+                    throw new Error('Three.js后期处理组件未正确加载');
+                }
+                
+                // 创建渲染场景
+                const renderScene = new THREE.RenderPass(scene, camera);
+                
+                // 创建辉光效果
+                bloomPass = new THREE.UnrealBloomPass(
+                    new THREE.Vector2(window.innerWidth, window.innerHeight),
+                    params.bloomStrength,
+                    params.bloomRadius,
+                    params.bloomThreshold
+                );
+                
+                // 创建效果合成器
+                composer = new THREE.EffectComposer(renderer);
+                composer.addPass(renderScene);
+                composer.addPass(bloomPass);
+                
+                // 窗口大小调整
+                window.addEventListener('resize', onWindowResize);
+                
+                return true;
+            } catch (error) {
+                console.error('Three.js初始化失败:', error);
+                showError(`Three.js初始化失败: ${error.message}`);
+                return false;
+            }
         }
         
         // 初始化粒子
@@ -445,7 +526,16 @@
         // 手部检测
         async function initHandDetection() {
             try {
+                updateLoadingStatus('加载手部检测模型...');
+                
+                // 设置TensorFlow.js后端
+                await tf.setBackend('webgl');
+                await tf.ready();
+                
+                // 加载手部检测模型
                 handposeModel = await handpose.load();
+                
+                updateLoadingStatus('启动摄像头...');
                 
                 video = document.createElement('video');
                 video.style.position = 'absolute';
@@ -458,19 +548,33 @@
                 document.getElementById('ui').appendChild(video);
                 
                 const stream = await navigator.mediaDevices.getUserMedia({
-                    video: { width: 640, height: 480, facingMode: 'user' }
+                    video: { 
+                        width: 640, 
+                        height: 480, 
+                        facingMode: 'user',
+                        frameRate: { ideal: 30 }
+                    }
+                }).catch(error => {
+                    throw new Error(`摄像头访问被拒绝: ${error.message}`);
                 });
                 
                 video.srcObject = stream;
-                video.play();
+                await video.play();
                 
+                // 开始手部检测
                 detectHand();
                 
+                return true;
             } catch (error) {
-                console.error('手部检测失败:', error);
+                console.error('手部检测初始化失败:', error);
+                showError(`手部检测不可用: ${error.message}`);
+                
+                // 使用鼠标滚轮作为备用控制
                 document.addEventListener('wheel', (e) => {
                     handScale = Math.max(0.1, Math.min(1.0, handScale - e.deltaY * 0.001));
                 });
+                
+                return false;
             }
         }
         
@@ -478,19 +582,23 @@
         async function detectHand() {
             if (!handposeModel || !video) return;
             
-            const predictions = await handposeModel.estimateHands(video);
-            
-            if (predictions.length > 0) {
-                const hand = predictions[0];
-                const thumbTip = hand.annotations.thumb[3];
-                const pinkyTip = hand.annotations.pinky[3];
+            try {
+                const predictions = await handposeModel.estimateHands(video);
                 
-                const dx = thumbTip[0] - pinkyTip[0];
-                const dy = thumbTip[1] - pinkyTip[1];
-                const dz = thumbTip[2] - pinkyTip[2];
-                const distance = Math.sqrt(dx*dx + dy*dy + dz*dz);
-                
-                handScale = Math.max(0.1, Math.min(1.0, distance / 150));
+                if (predictions.length > 0) {
+                    const hand = predictions[0];
+                    const thumbTip = hand.annotations.thumb[3];
+                    const pinkyTip = hand.annotations.pinky[3];
+                    
+                    const dx = thumbTip[0] - pinkyTip[0];
+                    const dy = thumbTip[1] - pinkyTip[1];
+                    const dz = thumbTip[2] - pinkyTip[2];
+                    const distance = Math.sqrt(dx*dx + dy*dy + dz*dz);
+                    
+                    handScale = Math.max(0.1, Math.min(1.0, distance / 150));
+                }
+            } catch (error) {
+                console.error('手部检测错误:', error);
             }
             
             requestAnimationFrame(detectHand);
@@ -498,6 +606,8 @@
         
         // 动画循环
         function animate() {
+            if (!isInitialized) return;
+            
             requestAnimationFrame(animate);
             
             // 平滑手掌缩放值
@@ -574,6 +684,7 @@
         function initUI() {
             document.getElementById('fullscreen-btn').addEventListener('click', toggleFullscreen);
             document.getElementById('reset-btn').addEventListener('click', initParticles);
+            document.getElementById('retry-btn').addEventListener('click', initApp);
             
             document.addEventListener('fullscreenchange', () => {
                 isFullscreen = !!document.fullscreenElement;
@@ -588,12 +699,37 @@
         
         // 初始化应用
         async function initApp() {
-            initThreeJS();
-            initUI();
-            await initHandDetection();
-            animate();
+            try {
+                // 重置状态
+                document.getElementById('error-message').classList.add('hidden');
+                document.getElementById('retry-btn').classList.add('hidden');
+                document.querySelector('.spinner').style.display = '';
+                
+                // 初始化Three.js
+                const threeJsSuccess = await initThreeJS();
+                if (!threeJsSuccess) return;
+                
+                // 初始化UI
+                initUI();
+                
+                // 初始化手部检测
+                await initHandDetection();
+                
+                // 标记为已初始化
+                isInitialized = true;
+                
+                // 开始动画
+                animate();
+                
+                // 隐藏加载界面
+                setTimeout(hideLoading, 500);
+            } catch (error) {
+                console.error('应用初始化失败:', error);
+                showError(`初始化失败: ${error.message}`);
+            }
         }
         
+        // 启动应用
         initApp();
     </script>
 </body>
